@@ -24,8 +24,8 @@ struct ChefHelperApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ScanningView(viewModel: ScanningViewModel())
-//            EmptyView() // 不再從這裡開始
+//            ScanningView(viewModel: ScanningViewModel())
+            EmptyView() // 不再從這裡開始
         }
     }
 }

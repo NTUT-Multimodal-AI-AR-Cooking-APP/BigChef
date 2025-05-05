@@ -12,8 +12,6 @@ struct Equipment: Codable {
     var type: String
     var size: String
     var material: String
-    
-    
 }
 
 struct Ingredient: Codable, Identifiable {

@@ -38,6 +38,7 @@ struct ScanningView: View {
                     IngredientInfoView
                     IngredientButton
                     PeopleSettingView
+                   
                 }
                 .ViewStyle()
                 .sheet(isPresented: $showingReceipt) {
@@ -47,14 +48,16 @@ struct ScanningView: View {
                         generatedSteps: generatedSteps
                     )
                 }
+                .padding(.bottom, 88) 
             }
+            
             .padding(.horizontal, 24)
             .ignoresSafeArea()
             .overlay(
                 VStack {
-                    Spacer()
-                    HomeBar()
-                })
+//                    Spacer()
+//                    HomeBar()
+                }) .ignoresSafeArea(.container, edges: .bottom)
             
             if viewModel.isLoading { RecipeLoadingView() }
         }

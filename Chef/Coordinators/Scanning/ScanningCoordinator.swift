@@ -20,24 +20,6 @@ final class ScanningCoordinator: Coordinator {
     }
 
     // MARK: - Start
-//    func start() {
-//        let vm = ScanningViewModel()
-//
-//        vm.onScanRequested = { [weak self] in
-//            self?.presentCamera()
-//        }
-//
-//        vm.onRecipeGenerated = { [weak self] response in
-//            guard let self else { return }
-//            let recipe = RecipeCoordinator(nav: self.nav)
-//            self.childCoordinators.append(recipe)
-//            recipe.start(with: response)
-//            
-//        }
-//
-//
-//        let view = ScanningView(viewModel: vm)
-//        nav.pushViewController(UIHostingController(rootView: view), animated: false)
 //    }
     func start() {
         let vm = ScanningViewModel()
@@ -53,6 +35,7 @@ final class ScanningCoordinator: Coordinator {
         }
 
         let page = ScanningView(viewModel: vm)
+            .withHomeBar()
         nav.pushViewController(UIHostingController(rootView: page), animated: false)
     }
 

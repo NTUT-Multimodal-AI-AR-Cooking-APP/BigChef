@@ -15,22 +15,13 @@ final class RecipeCoordinator: Coordinator {
         self.nav = nav
     }
 
-//    func start(
-//        with response: RecipeResponse
-//    ) {
-//        let vm = RecipeViewModel(response: response)
-//        let view = RecipeView(viewModel: vm)
-//        let page = UIHostingController(rootView: view)
-//
-//        nav.pushViewController(page, animated: true)
-//    }
     func start(with response: RecipeResponse) {
         print("🍽 push RecipeView 進 nav")
         print("   nav = \(nav)")
         print("   nav.stack.count(before) = \(nav.viewControllers.count)")
 
         let vm   = RecipeViewModel(response: response)
-        let page = UIHostingController(rootView: RecipeView(viewModel: vm))
+        let page = UIHostingController(rootView: RecipeView(viewModel: vm).withHomeBar())
         nav.pushViewController(page, animated: true)
 
         print("   nav.stack.count(after)  = \(nav.viewControllers.count)")

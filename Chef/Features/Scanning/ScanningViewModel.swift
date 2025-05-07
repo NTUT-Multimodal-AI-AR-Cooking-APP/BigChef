@@ -12,8 +12,10 @@ final class ScanningViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var equipmentItems: [String] = []
     @Published var ingredients: [Ingredient] = []
-    var onRecipeGenerated: ((RecipeResponse) -> Void)?
+    var onEquipmentScanRequested: (() -> Void)?
+    func equipmentButtonTapped() { onEquipmentScanRequested?() }
     
+    var onRecipeGenerated: ((RecipeResponse) -> Void)?
     var onScanRequested: (() -> Void)?
 
     func scanButtonTapped() { onScanRequested?() }

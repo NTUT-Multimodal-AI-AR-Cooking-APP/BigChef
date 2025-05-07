@@ -64,8 +64,8 @@ struct ScanningView: View {
     }
             
     var EquipmentButton : some View {
-        Button("Scaning") {
-            equipmentItems = ["Pan"]
+        Button("Scanning") {
+            viewModel.equipmentButtonTapped()
         }
         .scanningButtonStyle().scaleEffect(0.8)
     }
@@ -123,6 +123,7 @@ private extension ScanningView {
                 ForEach(equipmentItems.indices, id: \.self) { index in
                     TextField("Item", text: $equipmentItems[index])
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .foregroundColor(.black)
                 }
             }
         }

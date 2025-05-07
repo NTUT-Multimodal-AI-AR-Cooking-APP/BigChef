@@ -36,14 +36,23 @@ struct RecipeView: View {
                 .foregroundColor(.gray)
 
             // 步驟區塊
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(viewModel.steps.indices, id: \.self) { index in
-                    Text("Step \(index + 1): \(viewModel.steps[index].description)")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    ForEach(viewModel.steps.indices, id: \.self) { index in
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("步驟 \(index + 1)")
+                                .font(.title)
+                                .fontWeight(.semibold)
+                            Text(viewModel.steps[index].description)
+                                .font(.body)
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                    }
                 }
+                .padding(.vertical, 10)
             }
-            .padding(.vertical, 10)
 
             Spacer()
         }

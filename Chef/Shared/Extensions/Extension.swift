@@ -4,7 +4,7 @@
 //
 //  Created by 陳泓齊 on 2025/4/9.
 //
-
+import UIKit
 import SwiftUI
 extension View{
     func scanningButtonStyle() -> some View{
@@ -28,6 +28,10 @@ extension Color {
 }
 
 
+
+extension UIColor {
+    static let brandOrange = UIColor(red: 178/255, green: 72/255, blue: 22/255, alpha: 1)
+}
 
 
 extension RecipeStep: Identifiable {

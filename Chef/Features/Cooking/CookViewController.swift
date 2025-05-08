@@ -1,23 +1,21 @@
 //
-//  ARCameraViewController.swift
+//  CookViewController.swift
 //  ChefHelper
 //
-//  Created by 陳泓齊 on 2025/5/6.
+//  Created by 陳泓齊 on 2025/5/7.
 //
 
-import UIKit
-import ARKit
 
-final class ARCameraViewController: UIViewController {
+import UIKit
+
+/// 「開始烹飪」AR 流程 —— 延續你原本 ARCameraVC 的 UI
+final class CookViewController: BaseCameraViewController<ARSessionAdapter> {
 
     // MARK: - Data
     private let steps: [RecipeStep]
-    private var currentIndex = 0 {
-        didSet { updateStepLabel() }
-    }
+    private var currentIndex = 0 { didSet { updateStepLabel() } }
 
     // MARK: - UI
-    private let sceneView = ARSCNView(frame: .zero)
     private let stepLabel = UILabel()
     private let prevBtn   = UIButton(type: .system)
     private let nextBtn   = UIButton(type: .system)
@@ -25,16 +23,13 @@ final class ARCameraViewController: UIViewController {
     // MARK: - Init
     init(steps: [RecipeStep]) {
         self.steps = steps
-        super.init(nibName: nil, bundle: nil)
+        super.init(session: ARSessionAdapter())
     }
     required init?(coder: NSCoder) { fatalError() }
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
-
-        // sceneView layout 同之前 …
 
         // ▲ Step Label
         stepLabel.numberOfLines = 0
@@ -67,14 +62,14 @@ final class ARCameraViewController: UIViewController {
         updateStepLabel()
     }
 
-    // MARK: - Step control
+    // MARK: - Helpers
     private func updateStepLabel() {
+        guard !steps.isEmpty else { stepLabel.text = "無步驟"; return }
         let step = steps[currentIndex]
         stepLabel.text = "步驟 \(currentIndex + 1)/\(steps.count)：\(step.description)"
         prevBtn.isEnabled = currentIndex > 0
         nextBtn.isEnabled = currentIndex < steps.count - 1
     }
-
     @objc private func prevStep() { currentIndex -= 1 }
     @objc private func nextStep() { currentIndex += 1 }
 }

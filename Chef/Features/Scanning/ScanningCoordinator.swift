@@ -33,7 +33,7 @@ final class ScanningCoordinator: Coordinator {
                 guard let self, let camera else { return }
                 self.childCoordinators.removeAll { $0 === camera }
             }
-            camera.start()
+            camera.startScanning()
         }
         
         vm.onRecipeGenerated = { [weak self] resp in
@@ -46,7 +46,7 @@ final class ScanningCoordinator: Coordinator {
         }
 
         let page = ScanningView(viewModel: vm)
-            .withHomeBar()
+        nav.setNavigationBarHidden(true, animated: false)
         nav.pushViewController(UIHostingController(rootView: page), animated: false)
     }
 

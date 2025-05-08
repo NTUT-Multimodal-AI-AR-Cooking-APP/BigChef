@@ -8,14 +8,21 @@
 
 import Foundation
 
+// RecipeViewModel.swift
 final class RecipeViewModel: ObservableObject {
     let dishName: String
     let dishDescription: String
     let steps: [RecipeStep]
 
+    // ① 新增對外事件
+    var onCookRequested: (() -> Void)?
+
     init(response: RecipeResponse) {
-        self.dishName = response.dishName
+        self.dishName        = response.dishName
         self.dishDescription = response.dishDescription
-        self.steps = response.recipe
+        self.steps           = response.recipe
     }
+
+    // ② 按鈕點擊時呼叫
+    func cookButtonTapped() { onCookRequested?() }
 }

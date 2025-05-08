@@ -48,16 +48,11 @@ struct ScanningView: View {
                         generatedSteps: generatedSteps
                     )
                 }
-                .padding(.bottom, 88) 
+                .padding(.bottom, 88)
             }
             
             .padding(.horizontal, 24)
-            .ignoresSafeArea()
-            .overlay(
-                VStack {
-//                    Spacer()
-//                    HomeBar()
-                }) .ignoresSafeArea(.container, edges: .bottom)
+            .ignoresSafeArea(edges: .top)
             
             if viewModel.isLoading { RecipeLoadingView() }
         }

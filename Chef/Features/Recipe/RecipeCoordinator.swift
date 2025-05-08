@@ -11,20 +11,28 @@ final class RecipeCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     private unowned let nav: UINavigationController
     func start() {fatalError("Use start(with:) instead.") }
+    //MARK: - Init
     init(nav: UINavigationController) {
         self.nav = nav
     }
-
+    //MARK: - Start
     func start(with response: RecipeResponse) {
-        print("🍽 push RecipeView 進 nav")
-        print("   nav = \(nav)")
-        print("   nav.stack.count(before) = \(nav.viewControllers.count)")
+        let vm = RecipeViewModel(response: response)
 
-        let vm   = RecipeViewModel(response: response)
-        let page = UIHostingController(rootView: RecipeView(viewModel: vm).withHomeBar())
+        // ① 設定 callback
+        vm.onCookRequested = { [weak self] in
+            guard let self else { return }
+            let camera = CameraCoordinator(nav: self.nav)
+            self.childCoordinators.append(camera)
+            camera.onFinish = { [weak self, weak camera] in
+                guard let self, let camera else { return }
+                self.childCoordinators.removeAll { $0 === camera }
+            }
+            camera.start(with: response.recipe) // push camera with all steps
+        }
+
+        let page = UIHostingController(rootView: RecipeView(viewModel: vm))
         nav.pushViewController(page, animated: true)
-
-        print("   nav.stack.count(after)  = \(nav.viewControllers.count)")
     }
 
 }

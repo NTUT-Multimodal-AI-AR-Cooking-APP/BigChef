@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUICore
 
 final class MainTabCoordinator: Coordinator {
 
@@ -22,9 +23,25 @@ final class MainTabCoordinator: Coordinator {
     }
     
     private func startFlow() {
-            let scan = ScanningCoordinator(nav: nav)
-            childCoordinators.append(scan)
-            scan.start()
+        let tabBar = UITabBarController()
+        tabBar.viewControllers = [
+            makeHomeTab(),
+            makeScanningTab(),
+            makeHistoryTab()
+        ]
+        tabBar.selectedIndex = 1
+        tabBar.tabBar.backgroundColor = UIColor.brandOrange
+        tabBar.tabBar.isTranslucent = false
+        // Unify standard and scroll‑edge appearance colors
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor.brandOrange
+        tabBar.tabBar.standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            tabBar.tabBar.scrollEdgeAppearance = appearance
+        }
+        tabBar.tabBar.tintColor = .white
+        nav.setViewControllers([tabBar], animated: false)
     }
 
     // MARK: - Private - 工具
@@ -55,6 +72,21 @@ final class MainTabCoordinator: Coordinator {
         let scan = ScanningCoordinator(nav: nav)
         store(scan)
         scan.start()
+
+        return nav
+    }
+
+    private func makeHistoryTab() -> UIViewController {
+        let nav = UINavigationController()
+        nav.tabBarItem = UITabBarItem(
+            title: "History",
+            image: UIImage(systemName: "clock.arrow.circlepath"),
+            tag: 2
+        )
+
+        let history = HistoryCoordinator(nav: nav)
+        store(history)
+        history.start()
 
         return nav
     }

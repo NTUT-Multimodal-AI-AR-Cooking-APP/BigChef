@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RecipeAPI {
+struct RecipeService {
     static func generateRecipe(
         equipment: [[String: String]],
         ingredients: [[String: String]],

@@ -21,6 +21,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		3044BC162DCC7DCB00216D3A /* UnitTest */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = UnitTest;
+			sourceTree = "<group>";
+		};
 		30501B422DC331C700CB2198 /* Features */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Features;
@@ -65,6 +70,7 @@
 				30D9E0542DA60DC0001CDE03 /* Products */,
 				30501B422DC331C700CB2198 /* Features */,
 				30A657B12DC61CB90032C368 /* Coordinators */,
+				3044BC162DCC7DCB00216D3A /* UnitTest */,
 			);
 			sourceTree = "<group>";
 		};
@@ -92,6 +98,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				3044BC162DCC7DCB00216D3A /* UnitTest */,
 				30501B422DC331C700CB2198 /* Features */,
 				30501B4C2DC332B100CB2198 /* Shared */,
 				30A657B12DC61CB90032C368 /* Coordinators */,

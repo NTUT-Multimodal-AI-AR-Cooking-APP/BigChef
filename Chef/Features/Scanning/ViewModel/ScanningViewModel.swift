@@ -50,7 +50,7 @@ final class ScanningViewModel: ObservableObject {
             "doneness": "無"
         ]
         
-        RecipeAPI.generateRecipe(equipment: equipmentDict,
+        RecipeService.generateRecipe(equipment: equipmentDict,
                                  ingredients: ingredientsDict,
                                  preference: preference) { [weak self] result in
             DispatchQueue.main.async {

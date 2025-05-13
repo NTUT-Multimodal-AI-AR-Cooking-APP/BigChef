@@ -27,66 +27,8 @@ extension Color {
     static let brandOrange = Color(red: 178/255, green: 72/255, blue: 22/255)
 }
 
-struct BottomBar: View {
-    var body: some View {
-        HStack {
-            Spacer()
-            
-            Button(action: {
-                print("第一個 icon 被點了")
-            }) {
-                Image(systemName: "house.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(.white)
-            }
-            
-            Spacer()
-            
-            Button(action: {
-                print("第二個 icon 被點了")
-            }) {
-                Image(systemName: "magnifyingglass")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(.white)
-            }
-            
-            Spacer()
-            
-            Button(action: {
-                print("第三個 icon 被點了")
-            }) {
-                Image(systemName: "person.crop.circle")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(.white)
-            }
-            
-            Spacer()
-        }
-        .padding(.vertical, 14)
-//        .frame(maxWidth: .infinity)
-        .background(Color.brandOrange)
-    }
-}
 
-struct HomeBar : View{
-    var body: some View {
-        ZStack(alignment: .leading){
-            Button(action: {}) {
-                Image(systemName: "house.circle.fill")
-                    .font(.system(size: 50))
-                    .foregroundStyle(Color.brandOrange)
-            }
-            .offset(y:-50)
-            BottomBar()
-        }.offset(y: 30)
-    }
-}
+
 
 extension RecipeStep: Identifiable {
     var id: UUID { UUID() }

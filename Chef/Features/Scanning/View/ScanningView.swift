@@ -48,24 +48,19 @@ struct ScanningView: View {
                         generatedSteps: generatedSteps
                     )
                 }
-                .padding(.bottom, 88) 
+                .padding(.bottom, 88)
             }
             
             .padding(.horizontal, 24)
-            .ignoresSafeArea()
-            .overlay(
-                VStack {
-//                    Spacer()
-//                    HomeBar()
-                }) .ignoresSafeArea(.container, edges: .bottom)
+            .ignoresSafeArea(edges: .top)
             
             if viewModel.isLoading { RecipeLoadingView() }
         }
     }
             
     var EquipmentButton : some View {
-        Button("Scaning") {
-            equipmentItems = ["Pan"]
+        Button("Scanning") {
+            viewModel.equipmentButtonTapped()
         }
         .scanningButtonStyle().scaleEffect(0.8)
     }
@@ -123,6 +118,7 @@ private extension ScanningView {
                 ForEach(equipmentItems.indices, id: \.self) { index in
                     TextField("Item", text: $equipmentItems[index])
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .foregroundColor(.black)
                 }
             }
         }

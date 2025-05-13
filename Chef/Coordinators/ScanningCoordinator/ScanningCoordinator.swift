@@ -24,7 +24,18 @@ final class ScanningCoordinator: Coordinator {
     func start() {
         let vm = ScanningViewModel()
         print("👀 Coordinator vm = \(Unmanaged.passUnretained(vm).toOpaque())")
-
+        
+        vm.onEquipmentScanRequested = { [weak self] in
+            guard let self else { return }
+            let camera = CameraCoordinator(nav: self.nav)
+            self.childCoordinators.append(camera)
+            camera.onFinish = { [weak self, weak camera] in
+                guard let self, let camera else { return }
+                self.childCoordinators.removeAll { $0 === camera }
+            }
+            camera.startScanning()
+        }
+        
         vm.onRecipeGenerated = { [weak self] resp in
             guard let self else { return }
             // 這裡一定要印得到
@@ -35,23 +46,23 @@ final class ScanningCoordinator: Coordinator {
         }
 
         let page = ScanningView(viewModel: vm)
-            .withHomeBar()
+        nav.setNavigationBarHidden(true, animated: false)
         nav.pushViewController(UIHostingController(rootView: page), animated: false)
     }
 
 
 
     // MARK: - Navigation
-    private func presentCamera() {
-        // A. 建立相機 Flow
-        let camera = CameraCoordinator(root: nav)
-        childCoordinators.append(camera)
-
-        // B. 開始並在 CameraCoordinator 完成時把它移除
-        camera.onFinish = { [weak self, weak camera] in
-            guard let self, let camera else { return }
-            self.childCoordinators.removeAll { $0 === camera }
-        }
-        camera.start()
-    }
+//    private func presentCamera() {
+//        // A. 建立相機 Flow
+//        let camera = CameraCoordinator(root: nav)
+//        childCoordinators.append(camera)
+//
+//        // B. 開始並在 CameraCoordinator 完成時把它移除
+//        camera.onFinish = { [weak self, weak camera] in
+//            guard let self, let camera else { return }
+//            self.childCoordinators.removeAll { $0 === camera }
+//        }
+//        camera.start()
+//    }
 }

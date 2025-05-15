@@ -125,7 +125,18 @@ private extension ScanningView {
     }
     var IngredientInfoView : some View{
         VStack{
-            Text("INGREDIENT")
+            HStack {
+                Text("INGREDIENT")
+                Spacer()
+                Button(action: {
+                    // 點擊事件可填入你要的動作
+                    print("➕ Add Ingredient Tapped")
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.brandOrange)
+                        .font(.title2)
+                }
+            }
             List {
                 ForEach(ingredients) { ingredient in
                     Text(ingredient.name)

@@ -15,7 +15,8 @@ final class ScanningViewModel: ObservableObject {
     var onEquipmentScanRequested: (() -> Void)?
     var onScanRequested: (() -> Void)?
     var onRecipeGenerated: ((SuggestRecipeResponse) -> Void)?
-    var onScanCompleted: ((ScanImageResponse) -> Void)?
+    /// 掃描完成時的回調，包含掃描結果和摘要
+    var onScanCompleted: ((ScanImageResponse, String) -> Void)?
     
     // MARK: - Public Methods
     
@@ -119,12 +120,12 @@ final class ScanningViewModel: ObservableObject {
         serving_size: "1人份"      // 預設值
     )
     
-    // 使用閉包來存儲完成回調
-    private var onScanComplete: ((String) -> Void)?
-    
-    // 設置掃描完成的回調
+    /// 設置掃描完成的回調
     func setScanCompleteHandler(_ handler: @escaping (String) -> Void) {
-        self.onScanComplete = handler
+        // 將舊的回調轉換為新的格式
+        onScanCompleted = { _, summary in
+            handler(summary)
+        }
     }
     
     func scanImage() {
@@ -151,10 +152,9 @@ final class ScanningViewModel: ObservableObject {
                     // 更新識別出的食材和設備
                     response.ingredients.forEach { self.upsertIngredient($0) }
                     response.equipment.forEach { self.upsertEquipment($0) }
-                    self.onScanCompleted?(response)
                     
-                    // 使用回調通知掃描完成
-                    self.onScanComplete?(response.summary)
+                    // 使用單一的回調通知掃描完成，同時傳遞掃描結果和摘要
+                    self.onScanCompleted?(response, response.summary)
                 case .failure(let error):
                     print("❌ 掃描失敗：\(error.localizedDescription)")
                     // TODO: 處理錯誤情況

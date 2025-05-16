@@ -20,7 +20,6 @@ final class ScanningCoordinator: Coordinator {
     }
 
     // MARK: - Start
-//    }
     func start() {
         let vm = ScanningViewModel()
         print("👀 Coordinator vm = \(Unmanaged.passUnretained(vm).toOpaque())")
@@ -33,7 +32,7 @@ final class ScanningCoordinator: Coordinator {
                 guard let self, let camera else { return }
                 self.childCoordinators.removeAll { $0 === camera }
             }
-            camera.startScanning()
+            camera.start()
         }
         
         vm.onRecipeGenerated = { [weak self] resp in

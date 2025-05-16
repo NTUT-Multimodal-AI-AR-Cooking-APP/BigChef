@@ -37,6 +37,12 @@ final class ScanViewController: BaseCameraViewController<ARSessionAdapter> {
             label.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
         ])
 
-        viewModel.generateRecipe()
+        // 使用空的偏好設定初始化
+        let emptyPreference = Preference(
+            cooking_method: "",
+            dietary_restrictions: [],
+            serving_size: "1人份"
+        )
+        viewModel.generateRecipe(with: emptyPreference)
     }
 }

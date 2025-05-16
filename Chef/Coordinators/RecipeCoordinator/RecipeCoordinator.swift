@@ -16,9 +16,10 @@ final class RecipeCoordinator: Coordinator {
         self.nav = nav
     }
     //MARK: - Start
-    func start(with response: RecipeResponse) {
+    func start(with response: SuggestRecipeResponse) {
+        print("📦 RecipeCoordinator - start \(response.dish_name)")
         let vm = RecipeViewModel(response: response)
-
+        print("📦 RecipeCoordinator - pushing RecipeView1")
         // ① 設定 callback
         vm.onCookRequested = { [weak self] in
             guard let self else { return }
@@ -30,7 +31,7 @@ final class RecipeCoordinator: Coordinator {
             }
             camera.start(with: response.recipe) // push camera with all steps
         }
-
+        print("📦 RecipeCoordinator - pushing RecipeView")
         let page = UIHostingController(rootView: RecipeView(viewModel: vm))
         nav.pushViewController(page, animated: true)
     }

@@ -6,18 +6,13 @@
 //
 
 
-//
-//  ScanViewController.swift
-//  ChefHelper
-//
-//  建立日期：2025/05/07
-//
-
 import UIKit
 
 /// 掃描設備 / 食材畫面：
 /// 目前只先顯示 AR 預覽，日後再加掃描框、Vision OCR 等功能
 final class ScanViewController: BaseCameraViewController<ARSessionAdapter> {
+
+    private let viewModel = ScanningViewModel()
 
     // MARK: - Init
     init() {
@@ -41,5 +36,7 @@ final class ScanViewController: BaseCameraViewController<ARSessionAdapter> {
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             label.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
         ])
+
+        viewModel.generateRecipe()
     }
 }

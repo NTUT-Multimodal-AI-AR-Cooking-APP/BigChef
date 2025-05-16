@@ -15,54 +15,36 @@ final class ScanningViewModel: ObservableObject {
     var onEquipmentScanRequested: (() -> Void)?
     func equipmentButtonTapped() { onEquipmentScanRequested?() }
     
-    var onRecipeGenerated: ((RecipeResponse) -> Void)?
+    var onRecipeGenerated: ((SuggestRecipeResponse) -> Void)?
     var onScanRequested: (() -> Void)?
 
     func scanButtonTapped() { onScanRequested?() }
     func generateRecipe() {
         print("🚀 開始準備請求資料")
         isLoading = true
-        /* ……組 equipment / ingredients / preference 省略…… */
+
         let equipment = equipmentItems.map {
-            Equipment(name: $0, type: "鍋具", size: "中型", material: "不鏽鋼")
+            Equipment(name: $0, type: "鍋具", size: "中型", material: "不鏽鋼", power_source: "電")
         }
-        
-        let ingredientsDict = ingredients.map {
-            [
-                "name": $0.name,
-                "type": $0.type,
-                "amount": $0.amount,
-                "unit": $0.unit
-            ]
-        }
-        
-        let equipmentDict = equipment.map {
-            [
-                "name": $0.name,
-                "type": $0.type,
-                "size": $0.size,
-                "material": $0.material
-            ]
-        }
-        
-        let preference: [String: String] = [
-            "cooking_method": "無",
-            "doneness": "無"
-        ]
-        
-        RecipeService.generateRecipe(equipment: equipmentDict,
-                                 ingredients: ingredientsDict,
-                                 preference: preference) { [weak self] result in
+
+        let preference = Preference(cooking_method: "煎", dietary_restrictions: ["無"], serving_size: "1人份")
+
+        let request = SuggestRecipeRequest(
+            available_ingredients: ingredients,
+            available_equipment: equipment,
+            preference: preference
+        )
+
+        RecipeService.generateRecipe(using: request) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self else { return }
 
                 switch result {
                 case .success(let resp):
-                    print("✅ 成功解析 JSON，菜名：\(resp.dishName)")
+                    print("✅ 成功解析 JSON，菜名：\(resp.dish_name)")
                     print("🎉 觸發畫面跳轉 → RecipeView")
-                    self.onRecipeGenerated?(resp)          // ① push
+                    self.onRecipeGenerated?(resp)
 
-                    // ② 稍晚 0.2 秒關掉 loading，避免把畫面遮住
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         self.isLoading = false
                     }
@@ -77,4 +59,3 @@ final class ScanningViewModel: ObservableObject {
 
  
 }
-

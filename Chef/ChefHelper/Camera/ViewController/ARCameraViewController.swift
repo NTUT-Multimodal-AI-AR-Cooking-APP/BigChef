@@ -39,7 +39,7 @@ final class ARCameraViewController: UIViewController {
         // ▲ Step Label
         stepLabel.numberOfLines = 0
         stepLabel.textColor = .white
-        stepLabel.font = .preferredFont(forTextStyle: .headline)
+        stepLabel.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         stepLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stepLabel)
 
@@ -70,7 +70,7 @@ final class ARCameraViewController: UIViewController {
     // MARK: - Step control
     private func updateStepLabel() {
         let step = steps[currentIndex]
-        stepLabel.text = "步驟 \(currentIndex + 1)/\(steps.count)：\(step.description)"
+        stepLabel.text = "步驟 \(step.step_number)：\(step.title)\n\(step.description)"
         prevBtn.isEnabled = currentIndex > 0
         nextBtn.isEnabled = currentIndex < steps.count - 1
     }

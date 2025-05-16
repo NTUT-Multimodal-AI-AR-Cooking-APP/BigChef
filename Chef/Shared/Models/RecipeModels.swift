@@ -7,53 +7,64 @@
 
 import Foundation
 
-struct Equipment: Codable {
-    var name: String
-    var type: String
-    var size: String
-    var material: String
-}
-
 struct Ingredient: Codable, Identifiable {
-    var id = UUID() // SwiftUI List 需要 identifiable
-    var name: String
-    var type: String
-    var amount: String
-    var unit: String
-    var weight: String?
-    static let examples: [Ingredient] = [
-           Ingredient(name: "牛排", type: "食材", amount: "1", unit: "塊", weight: "250g"),
-//           Ingredient(name: "油", type: "食材", amount: "2", unit: "湯匙", weight: nil)
-       ]
+    var id = UUID() // ✅ 本地用於 SwiftUI 辨識，不參與 JSON 傳輸
+
+    let name: String
+    let type: String
+    let amount: String
+    let unit: String
+    let preparation: String
+
+    private enum CodingKeys: String, CodingKey {
+        case name, type, amount, unit, preparation
+        // ❌ 不包含 id
+    }
+}
+struct Equipment: Codable {
+    let name: String
+    let type: String
+    let size: String
+    let material: String
+    let power_source: String
 }
 
 struct Preference: Codable {
-    var cooking_method: String
-    var doneness: String
+    let cooking_method: String
+    let dietary_restrictions: [String]
+    let serving_size: String
 }
 
-struct RecipeRequest: Codable {
-    var equipment: [Equipment]
-    var ingredients: [Ingredient]
-    var preference: Preference
+struct SuggestRecipeRequest: Codable {
+    let available_ingredients: [Ingredient]
+    let available_equipment: [Equipment]
+    let preference: Preference
 }
 
-struct RecipeResponse: Codable {
-    let dishName: String
-    let dishDescription: String
+struct SuggestRecipeResponse: Codable {
+    let dish_name: String
+    let dish_description: String
+    let ingredients: [Ingredient]
+    let equipment: [Equipment]
     let recipe: [RecipeStep]
-
-    enum CodingKeys: String, CodingKey {
-        case dishName = "dish_name"
-        case dishDescription = "dish_description"
-        case recipe
-    }
 }
 
-struct RecipeStep: Codable {
-    let step: String
-    let time: String
-    let temperature: String
+struct RecipeStep: Codable, Identifiable {
+    var id: Int { step_number }
+    let step_number: Int
+    let title: String
     let description: String
-    let doneness: String?
+    let actions: [Action]
+    let estimated_total_time: String
+    let temperature: String
+    let warnings: String?
+    let notes: String
+}
+
+struct Action: Codable {
+    let action: String
+    let tool_required: String
+    let material_required: [String]
+    let time_minutes: Int
+    let instruction_detail: String
 }

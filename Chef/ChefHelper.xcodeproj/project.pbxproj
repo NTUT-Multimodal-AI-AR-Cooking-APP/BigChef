@@ -34,7 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		30D9E0532DA60DC0001CDE03 /* ChefHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = ChefHelper.app; path = "/Users/mitch/Desktop/BigChef/Chef/build/Debug-iphoneos/ChefHelper.app"; sourceTree = "<absolute>"; };
+		30AB0E1D2DD64F2700101557 /* ChefHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChefHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30DC26D52DD5915E0081F80C /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
 		30DC26D62DD5915E0081F80C /* BeatEggAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeatEggAnimation.swift; sourceTree = "<group>"; };
 		30DC26D72DD5915E0081F80C /* CountdownAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownAnimation.swift; sourceTree = "<group>"; };
@@ -125,6 +125,7 @@
 				30A657B12DC61CB90032C368 /* Coordinators */,
 				3044BC162DCC7DCB00216D3A /* UnitTest */,
 				30DC27052DD591D00081F80C /* Frameworks */,
+				30AB0E1D2DD64F2700101557 /* ChefHelper.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -216,7 +217,7 @@
 				30DC270B2DD592D10081F80C /* GoogleGenerativeAI */,
 			);
 			productName = ChefHelper;
-			productReference = 30D9E0532DA60DC0001CDE03 /* ChefHelper.app */;
+			productReference = 30AB0E1D2DD64F2700101557 /* ChefHelper.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

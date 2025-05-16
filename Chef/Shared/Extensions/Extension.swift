@@ -34,9 +34,7 @@ extension UIColor {
 }
 
 
-extension RecipeStep: Identifiable {
-    var id: UUID { UUID() }
-}
+
 
 
 struct GeneratedReceiptView: View {
@@ -46,80 +44,76 @@ struct GeneratedReceiptView: View {
     let generatedDishDescription: String
     let generatedSteps: [RecipeStep]
     
+    private var contentView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Header section
+            VStack(alignment: .leading, spacing: 8) {
+                Text("🍽️ \(generatedDishName)")
+                    .font(.title)
+                    .fontWeight(.bold)
+                
+                Text(generatedDishDescription)
+                    .font(.body)
+                    .foregroundColor(.gray)
+                    .padding(.bottom, 8)
+                
+                Divider()
+            }
+            
+            // Steps section
+            Text("食譜步驟")
+                .font(.headline)
+                .padding(.top, 4)
+            
+            if generatedSteps.isEmpty {
+                Text("無可用的烹飪步驟")
+                    .foregroundColor(.gray)
+                    .italic()
+            } else {
+                ForEach(generatedSteps) { step in
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("步驟 \(step.step_number): \(step.title)")
+                                .font(.headline)
+                                .fontWeight(.medium)
+                            
+                            Spacer()
+                            
+                            // Time and temperature info
+                            if !step.estimated_total_time.isEmpty {
+                                Label(step.estimated_total_time, systemImage: "clock")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            if !step.temperature.isEmpty {
+                                Label(step.temperature, systemImage: "thermometer")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        
+                        Text(step.description)
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                    .padding(.bottom, 8)
+                }
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Header section
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("🍽️ \(generatedDishName)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                        
-                        Text(generatedDishDescription)
-                            .font(.body)
-                            .foregroundColor(.gray)
-                            .padding(.bottom, 8)
-                        
-                        Divider()
-                    }
-                    
-                    // Steps section
-                    Text("食譜步驟")
-                        .font(.headline)
-                        .padding(.top, 4)
-                    
-                    if generatedSteps.isEmpty {
-                        Text("無可用的烹飪步驟")
-                            .foregroundColor(.gray)
-                            .italic()
-                    } else {
-                        ForEach(0..<generatedSteps.count, id: \.self) { index in
-                            let step = generatedSteps[index]
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Text("步驟 \(index + 1): \(step.step)")
-                                        .font(.headline)
-                                        .fontWeight(.medium)
-                                    
-                                    Spacer()
-                                    
-                                    // Time and temperature info
-                                    if !step.time.isEmpty {
-                                        Label(step.time, systemImage: "clock")
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
-                                    }
-                                    
-                                    if !step.temperature.isEmpty {
-                                        Label(step.temperature, systemImage: "thermometer")
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                                
-                                Text(step.description)
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                
-                                if let doneness = step.doneness, !doneness.isEmpty {
-                                    Text("完成度: \(doneness)")
-                                        .font(.caption)
-                                        .foregroundColor(.orange)
-                                        .padding(.top, 2)
-                                }
-                            }
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 12)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(8)
-                            .padding(.bottom, 8)
-                        }
-                    }
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
+                contentView
             }
             .navigationTitle("食譜詳情")
             .navigationBarTitleDisplayMode(.inline)
@@ -140,7 +134,7 @@ struct GeneratedReceiptView: View {
             .onAppear {
                 print("Sheet appeared with \(generatedSteps.count) steps")
                 if !generatedSteps.isEmpty {
-                    print("First step: \(generatedSteps[0].step)")
+                    print("First step: \(generatedSteps[0].step_number)")
                 }
             }
         }

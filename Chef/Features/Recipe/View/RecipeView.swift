@@ -30,6 +30,12 @@ struct RecipeView: View {
                         .font(.title)
                         .bold()
 
+                    Text(viewModel.dishDescription)
+                        .font(.body)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+
                     Text("Ingredients")
                         .font(.subheadline)
                         .foregroundColor(.gray)
@@ -45,7 +51,7 @@ struct RecipeView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         ForEach(viewModel.steps.indices, id: \.self) { index in
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("步驟 \(index + 1)")
+                                Text("步驟 \(viewModel.steps[index].step_number)：\(viewModel.steps[index].title)")
                                     .font(.headline)
                                     .foregroundColor(.black)
                                 Text(viewModel.steps[index].description)
@@ -82,8 +88,49 @@ struct RecipeView: View {
 }
 
 #Preview {
-    let sampleStep = RecipeStep(step: "1", time: "5m", temperature: "120°C", description: "將牛排從冰箱取出，放置於室溫約 20 分鐘，讓其回溫。接著在牛排兩面均勻抹上橄欖油與海鹽，並撒上現磨黑胡椒。預熱平底鍋至中高溫，將牛排放入鍋中，每面煎約 2 分鐘，煎至表面微焦並鎖住肉汁。", doneness: nil)
-    let response = RecipeResponse(dishName: "SALAD", dishDescription: "A light healthy dish", recipe: [sampleStep, sampleStep])
+    let sampleAction = Action(
+        action: "煎",
+        tool_required: "平底鍋",
+        material_required: ["牛排"],
+        time_minutes: 5,
+        instruction_detail: "煎至表面微焦並鎖住肉汁"
+    )
+
+    let sampleStep = RecipeStep(
+        step_number: 1,
+        title: "煎牛排",
+        description: "將牛排從冰箱取出，放置於室溫約 20 分鐘，讓其回溫。",
+        actions: [sampleAction],
+        estimated_total_time: "5分鐘",
+        temperature: "中火",
+        warnings: nil,
+        notes: "可加海鹽與胡椒調味"
+    )
+
+    let sampleIngredient = Ingredient(
+        name: "牛排",
+        type: "肉類",
+        amount: "1",
+        unit: "塊",
+        preparation: "室溫退冰"
+    )
+
+    let sampleEquipment = Equipment(
+        name: "平底鍋",
+        type: "鍋具",
+        size: "中型",
+        material: "鐵",
+        power_source: "瓦斯"
+    )
+
+    let response = SuggestRecipeResponse(
+        dish_name: "SALAD",
+        dish_description: "A light healthy dish",
+        ingredients: [sampleIngredient],
+        equipment: [sampleEquipment],
+        recipe: [sampleStep, sampleStep]
+    )
+
     let viewModel = RecipeViewModel(response: response)
     return RecipeView(viewModel: viewModel)
 }

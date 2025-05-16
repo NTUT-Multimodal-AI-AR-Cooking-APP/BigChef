@@ -29,7 +29,7 @@ final class MainTabCoordinator: Coordinator {
             makeScanningTab(),
             makeHistoryTab()
         ]
-        tabBar.selectedIndex = 1
+        tabBar.selectedIndex = 0
         tabBar.tabBar.backgroundColor = UIColor.brandOrange
         tabBar.tabBar.isTranslucent = false
         // Unify standard and scroll‑edge appearance colors

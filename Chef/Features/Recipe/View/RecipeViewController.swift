@@ -5,6 +5,13 @@
 //  Created by 陳泓齊 on 2025/4/24.
 //
 
+//
+//  RecipeViewController.swift
+//  ChefHelper
+//
+//  Created by 陳泓齊 on 2025/4/24.
+//
+
 import UIKit
 
 
@@ -17,57 +24,42 @@ class ViewController: UIViewController {
 
         // 設定設備、食材和偏好
 
-        let equipment = [Equipment(name: "平底鍋", type: "鍋具", size: "中型", material: "不鏽鋼")]
+        let equipment = [Equipment(name: "平底鍋", type: "鍋具", size: "中型", material: "不鏽鋼", power_source: "電")]
 
         let ingredients = [
 
-            Ingredient(name: "油", type: "食材", amount: "2", unit: "湯匙", weight: nil),
+            Ingredient(name: "油", type: "食材", amount: "2", unit: "湯匙", preparation: "無"),
 
-            Ingredient(name: "牛排", type: "食材", amount: "1", unit: "塊", weight: "250g")
+            Ingredient(name: "牛排", type: "食材", amount: "1", unit: "塊", preparation: "無")
 
         ]
 
-        let preference = Preference(cooking_method: "煎", doneness: "中等熟")
-
-        
-
+        let preference = Preference(cooking_method: "煎", dietary_restrictions: ["無"], serving_size: "1人份")
         // 創建請求資料
 
-        let request = RecipeRequest(equipment: equipment, ingredients: ingredients, preference: preference)
-
-
+        let request = SuggestRecipeRequest(available_ingredients: ingredients, available_equipment: equipment, preference: preference)
 
         // 呼叫 generateRecipe 函數發送請求
 
         generateRecipe(request: request)
 
     }
-
-
-
     override func viewDidLoad() {
 
         super.viewDidLoad()
-
     }
-
-
 
     // 發送 POST 請求的函數
 
-    func generateRecipe(request: RecipeRequest) {
+    func generateRecipe(request: SuggestRecipeRequest) {
 
-        // 嘗試創建 URL "http://<你的Windows伺服器IP>:8080/generate-recipe"
-
-        guard let url = URL(string: "http://192.168.0.103:8080/generate-recipe") else {
+        guard let url = URL(string: "http://localhost:8080/api/v1/recipe/suggest") else {
 
             print("無效的 URL")
 
             return
 
         }
-
-
 
         // 創建 URLRequest 物件
 
@@ -76,9 +68,6 @@ class ViewController: UIViewController {
         urlRequest.httpMethod = "POST"
 
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        
-
         // 將資料編碼為 JSON
 
         let encoder = JSONEncoder()
@@ -89,6 +78,9 @@ class ViewController: UIViewController {
 
             urlRequest.httpBody = jsonData
 
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                print("✅ 傳送的 JSON：\n\(jsonString)")
+            }
         } catch {
 
             print("無法編碼請求資料：\(error)")
@@ -96,8 +88,6 @@ class ViewController: UIViewController {
             return
 
         }
-
-        
 
         // 使用 URLSession 發送請求
 
@@ -114,9 +104,6 @@ class ViewController: UIViewController {
                 return
 
             }
-
-
-
             // 偵錯：檢查回應
 
             if let httpResponse = response as? HTTPURLResponse {
@@ -133,8 +120,6 @@ class ViewController: UIViewController {
 
             }
 
-
-
             // 偵錯：檢查資料
 
             guard let data = data else {
@@ -145,26 +130,20 @@ class ViewController: UIViewController {
 
             }
 
-
-
             // 嘗試解析 JSON 回應
 
             do {
 
                 let decoder = JSONDecoder()
 
-                let recipeResponse = try decoder.decode(RecipeResponse.self, from: data)
+                let recipeResponse = try decoder.decode(SuggestRecipeResponse.self, from: data)
 
-                print("食譜名稱：\(recipeResponse.dishName)")
+                print("食譜名稱：\(recipeResponse.dish_name)")
 
-                print("食譜描述：\(recipeResponse.dishDescription)")
-
-                
+                print("食譜描述：\(recipeResponse.dish_description)")
 
                 for step in recipeResponse.recipe {
-
-                    print("步驟：\(step.step), 時間：\(step.time), 溫度：\(step.temperature), 描述：\(step.description), 熟度：\(step.doneness ?? "無")")
-
+                    print("步驟：\(step.step_number), 溫度：\(step.temperature), 描述：\(step.description))")
                 }
 
             } catch {
@@ -175,13 +154,9 @@ class ViewController: UIViewController {
 
         }
 
-        
-
         // 偵錯：請求開始前
 
         print("發送請求：\(urlRequest)")
-
-        
 
         // 啟動請求
 
@@ -189,10 +164,4 @@ class ViewController: UIViewController {
 
     }
 
-
-
-
-
 }
-
-

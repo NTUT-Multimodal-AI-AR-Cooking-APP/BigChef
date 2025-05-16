@@ -9,46 +9,49 @@ import Foundation
 
 struct RecipeService {
     static func generateRecipe(
-        equipment: [[String: String]],
-        ingredients: [[String: String]],
-        preference: [String: String],
-        completion: @escaping (Result<RecipeResponse, Error>) -> Void
+        using request: SuggestRecipeRequest,
+        completion: @escaping (Result<SuggestRecipeResponse, Error>) -> Void
     ) {
-        guard let url = URL(string: "http://localhost:8080/generate-recipe") else {
+        guard let url = URL(string: "http://localhost:8080/api/v1/recipe/suggest") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1)))
             return
         }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        let body: [String: Any] = [
-            "equipment": equipment,
-            "ingredients": ingredients,
-            "preference": preference
-        ]
+        do {
+            let jsonData = try JSONEncoder().encode(request)
+            urlRequest.httpBody = jsonData
 
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                print("🟢 實際送出的 JSON：\n\(jsonString)")
+            }
+        } catch {
+            completion(.failure(error))
+            return
+        }
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-
             guard let data = data else {
-                let noDataError = NSError(domain: "", code: 999, userInfo: [NSLocalizedDescriptionKey: "無回應資料"])
-                completion(.failure(noDataError))
+                completion(.failure(NSError(domain: "No data returned", code: -1)))
                 return
             }
-
             do {
-                let decoded = try JSONDecoder().decode(RecipeResponse.self, from: data)
+                let decoded = try JSONDecoder().decode(SuggestRecipeResponse.self, from: data)
                 completion(.success(decoded))
             } catch {
+                if let raw = String(data: data, encoding: .utf8) {
+                    print("🔴 回傳原始 JSON：\n\(raw)")
+                }
+                print("❌ 解碼失敗：\(error)")
                 completion(.failure(error))
             }
-
         }.resume()
     }
 }

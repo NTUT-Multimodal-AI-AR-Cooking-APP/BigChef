@@ -13,16 +13,18 @@ final class RecipeViewModel: ObservableObject {
     let dishName: String
     let dishDescription: String
     let steps: [RecipeStep]
-
-    // ① 新增對外事件
     var onCookRequested: (() -> Void)?
 
-    init(response: RecipeResponse) {
-        self.dishName        = response.dishName
-        self.dishDescription = response.dishDescription
+    init(response: SuggestRecipeResponse) {
+        
+        print("🧩 進入 RecipeViewModel init，開始解構 response")
+        self.dishName = response.dish_name
+        print("✅ dishName 設定完成：\(dishName)")
+        
+        self.dishDescription = response.dish_description
         self.steps           = response.recipe
     }
-
-    // ② 按鈕點擊時呼叫
-    func cookButtonTapped() { onCookRequested?() }
+    func cookButtonTapped() {
+        print("🍳 cookButtonTapped 被觸發")
+        onCookRequested?() }
 }

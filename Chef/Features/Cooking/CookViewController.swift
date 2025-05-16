@@ -66,7 +66,7 @@ final class CookViewController: BaseCameraViewController<ARSessionAdapter> {
     private func updateStepLabel() {
         guard !steps.isEmpty else { stepLabel.text = "無步驟"; return }
         let step = steps[currentIndex]
-        stepLabel.text = "步驟 \(currentIndex + 1)/\(steps.count)：\(step.description)"
+        stepLabel.text = "步驟 \(step.step_number)：\(step.title)\n\(step.description)"
         prevBtn.isEnabled = currentIndex > 0
         nextBtn.isEnabled = currentIndex < steps.count - 1
     }

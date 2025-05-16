@@ -50,19 +50,4 @@ final class ScanningCoordinator: Coordinator {
         nav.pushViewController(UIHostingController(rootView: page), animated: false)
     }
 
-
-
-    // MARK: - Navigation
-//    private func presentCamera() {
-//        // A. 建立相機 Flow
-//        let camera = CameraCoordinator(root: nav)
-//        childCoordinators.append(camera)
-//
-//        // B. 開始並在 CameraCoordinator 完成時把它移除
-//        camera.onFinish = { [weak self, weak camera] in
-//            guard let self, let camera else { return }
-//            self.childCoordinators.removeAll { $0 === camera }
-//        }
-//        camera.start()
-//    }
 }

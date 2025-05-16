@@ -14,7 +14,10 @@ struct ScanningView: View {
         _viewModel = StateObject(wrappedValue: viewModel)
         print("👀 View 使用的 vm = \(Unmanaged.passUnretained(viewModel).toOpaque())")
     }
-    @State private var ingredients: [Ingredient] = Ingredient.examples
+    @State private var ingredients: [Ingredient] = [
+        Ingredient(name: "蛋", type: "蛋類", amount: "2", unit: "顆", preparation: "打散"),
+        Ingredient(name: "洋蔥", type: "蔬菜", amount: "1", unit: "顆", preparation: "切絲")
+    ]
     @State private var equipmentItems = ["", ""]
     @State private var generatedDishName: String = ""
     @State private var generatedDishDescription: String = ""
@@ -125,7 +128,18 @@ private extension ScanningView {
     }
     var IngredientInfoView : some View{
         VStack{
-            Text("INGREDIENT")
+            HStack {
+                Text("INGREDIENT")
+                Spacer()
+                Button(action: {
+                    // 點擊事件可填入你要的動作
+                    print("➕ Add Ingredient Tapped")
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.brandOrange)
+                        .font(.title2)
+                }
+            }
             List {
                 ForEach(ingredients) { ingredient in
                     Text(ingredient.name)

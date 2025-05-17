@@ -13,7 +13,16 @@ import Firebase
 class AppDelegate: NSObject, UIApplicationDelegate, UIWindowSceneDelegate { // 確保遵從協定
 
     var window: UIWindow?
-    var appCoordinator: AppCoordinator? // 改為可選，因為 AppCoordinator 現在需要 Router
+    var appCoordinator: AppCoordinator?
+
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        // 在應用程序啟動時配置 Firebase
+        FirebaseApp.configure()
+        return true
+    }
 
     func application(
         _ application: UIApplication,
@@ -25,7 +34,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UIWindowSceneDelegate { // �
             sessionRole: connectingSceneSession.role
         )
         cfg.delegateClass = Self.self
-        FirebaseApp.configure()
         return cfg
     }
 
@@ -39,19 +47,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UIWindowSceneDelegate { // �
         let window = UIWindow(windowScene: windowScene)
         self.window = window
 
-        // 建立根 UINavigationController
-        let rootNavController = UINavigationController()
-        window.rootViewController = rootNavController // 先設定 rootViewController
-        window.makeKeyAndVisible()
-
-        // 建立 App 的主 Router
-        let appRouter = UIKitRouter(navigationController: rootNavController)
-
         // 建立並啟動 AppCoordinator
-        let coordinator = AppCoordinator(router: appRouter)
-        self.appCoordinator = coordinator // 儲存 appCoordinator
-        coordinator.start(animated: false) // 傳遞 animated 參數
-
-        print("✅ AppCoordinator.start() 完成, router 的根是 \(appRouter.navigationController)")
+        let coordinator = AppCoordinator(window: window)
+        self.appCoordinator = coordinator
+        coordinator.start()
     }
 }

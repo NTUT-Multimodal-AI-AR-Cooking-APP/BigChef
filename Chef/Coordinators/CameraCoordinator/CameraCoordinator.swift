@@ -64,11 +64,13 @@
 //}
 
 import UIKit
+import SwiftUI
 
 @MainActor
-final class CameraCoordinator: Coordinator {
+final class CameraCoordinator: Coordinator, ObservableObject {
+
     var childCoordinators: [Coordinator] = []
-    private let navigationController: UINavigationController
+    var navigationController: UINavigationController
 
     /// 當相機流程結束時，讓父協調器可以把它移除
     var onFinish: (() -> Void)?
@@ -80,10 +82,12 @@ final class CameraCoordinator: Coordinator {
     func start() {
         let cameraVC = ARCameraViewController(steps: [])
         cameraVC.title = "Camera"
+
         cameraVC.navigationItem.rightBarButtonItem = UIBarButtonItem(
             systemItem: .close,
             primaryAction: UIAction { [weak self] _ in self?.close() }
         )
+
         navigationController.pushViewController(cameraVC, animated: true)
     }
 
@@ -91,22 +95,26 @@ final class CameraCoordinator: Coordinator {
     func start(with steps: [RecipeStep]) {
         let cameraVC = ARCameraViewController(steps: steps)
         cameraVC.title = "Cooking Camera"
+
         cameraVC.navigationItem.rightBarButtonItem = UIBarButtonItem(
             systemItem: .close,
             primaryAction: UIAction { [weak self] _ in self?.close() }
         )
+
         navigationController.pushViewController(cameraVC, animated: true)
     }
-    func startScanning() {
-       let vc = ScanViewController()
-       navigationController.pushViewController(vc, animated: true)
-   }
 
-   // 烹飪流程（帶步驟）
-    func startCooking(with steps: [RecipeStep]) {
-       let vc = CookViewController(steps: steps)
-       navigationController.pushViewController(vc, animated: true)
+    func startScanning() {
+        let vc = ScanViewController()
+        navigationController.pushViewController(vc, animated: true)
     }
+
+    // 烹飪流程（帶步驟）
+    func startCooking(with steps: [RecipeStep]) {
+        let vc = CookViewController(steps: steps)
+        navigationController.pushViewController(vc, animated: true)
+    }
+
     private func close() {
         navigationController.popViewController(animated: true)
         onFinish?()

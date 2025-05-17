@@ -23,21 +23,19 @@ final class CameraCoordinator: Coordinator {
 
     
     func start() {
-        let cameraVC = ARCameraViewController(steps: [])
-        cameraVC.title = "Camera"
+        let cookVC = CookViewController(steps: [])
+        cookVC.title = "Camera"
 
-        // 右上角 Close ⇒ 用 navigationItem 搭配 pop
-        cameraVC.navigationItem.rightBarButtonItem = UIBarButtonItem(
+        cookVC.navigationItem.rightBarButtonItem = UIBarButtonItem(
             systemItem: .close,
             primaryAction: UIAction { [weak self] _ in self?.close() }
         )
 
-        nav.pushViewController(cameraVC, animated: true)
+        nav.pushViewController(cookVC, animated: true)
     }
-
     /// Start cooking camera flow with recipe steps
     func start(with steps: [RecipeStep]) {
-        let cameraVC = ARCameraViewController(steps: steps)
+        let cameraVC = CookViewController(steps: steps)
         cameraVC.title = "Cooking Camera"
 
         cameraVC.navigationItem.rightBarButtonItem = UIBarButtonItem(
@@ -54,8 +52,11 @@ final class CameraCoordinator: Coordinator {
 
    // 烹飪流程（帶步驟）
     func startCooking(with steps: [RecipeStep]) {
-       let vc = CookViewController(steps: steps)
-       nav.pushViewController(vc, animated: true)
+//       let vc = CookViewController(steps: steps)
+//       nav.pushViewController(vc, animated: true)
+//
+        let vc = CookViewController(steps: steps)
+        nav.pushViewController(vc, animated: false)
     }
     private func close() {
         nav.popViewController(animated: true)

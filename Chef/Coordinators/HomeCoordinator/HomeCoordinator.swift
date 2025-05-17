@@ -6,16 +6,19 @@
 //
 
 import UIKit
+import SwiftUI
 
 final class HomeCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     private unowned let nav: UINavigationController
+    
     init(nav: UINavigationController) { self.nav = nav }
 
     func start() {
-        let vc = UIViewController()
-        vc.view.backgroundColor = .systemBackground
-        vc.title = "Home (stub)"
-        nav.pushViewController(vc, animated: false)
+        let vm = HomeViewModel()
+        let view = HomeView(viewModel: vm)
+        let page = UIHostingController(rootView: view)
+        nav.setNavigationBarHidden(true, animated: false)
+        nav.pushViewController(page, animated: false)
     }
 }

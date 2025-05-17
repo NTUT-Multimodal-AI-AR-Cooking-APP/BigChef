@@ -8,11 +8,18 @@
 import Foundation
 
 struct RecipeService {
+    private static var baseURL: String {
+        Bundle.main.object(forInfoDictionaryKey: "API_BASE_URL") as? String ?? ""
+    }
     static func generateRecipe(
+
         using request: SuggestRecipeRequest,
         completion: @escaping (Result<SuggestRecipeResponse, Error>) -> Void
     ) {
-        guard let url = URL(string: "http://localhost:8080/api/v1/recipe/suggest") else {
+
+        
+
+        guard let url = URL(string: "http://\(baseURL):8080/api/v1/recipe/suggest") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1)))
             return
         }

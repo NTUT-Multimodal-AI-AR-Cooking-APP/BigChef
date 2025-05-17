@@ -22,7 +22,6 @@ struct ScanningView: View {
     @State private var generatedDishName: String = ""
     @State private var generatedDishDescription: String = ""
     @State private var generatedSteps: [RecipeStep] = []
-    @State private var showingReceipt: Bool = false
     
     var body: some View {
         ZStack{
@@ -44,13 +43,6 @@ struct ScanningView: View {
                    
                 }
                 .ViewStyle()
-                .sheet(isPresented: $showingReceipt) {
-                    GeneratedReceiptView(
-                        generatedDishName: generatedDishName,
-                        generatedDishDescription: generatedDishDescription,
-                        generatedSteps: generatedSteps
-                    )
-                }
                 .padding(.bottom, 88)
             }
             

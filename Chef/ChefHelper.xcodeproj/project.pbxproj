@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3054A64B2DD831B8001E62CC /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = 3054A64A2DD831B8001E62CC /* GoogleGenerativeAI */; };
+		3054A64D2DD839C6001E62CC /* CookDetect.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 3054A64C2DD839C6001E62CC /* CookDetect.mlmodel */; };
 		30DC26EF2DD5915E0081F80C /* meat.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 30DC26E52DD5915E0081F80C /* meat.usdz */; };
 		30DC26F02DD5915E0081F80C /* flip.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 30DC26E42DD5915E0081F80C /* flip.usdz */; };
 		30DC26F22DD5915E0081F80C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30DC26E72DD5915E0081F80C /* Preview Assets.xcassets */; };
 		30DC26F32DD5915E0081F80C /* butter.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 30DC26E32DD5915E0081F80C /* butter.usdz */; };
-		30DC26F42DD5915E0081F80C /* CookDetect2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 30DC26EC2DD5915E0081F80C /* CookDetect2.mlmodel */; };
 		30DC26F52DD5915E0081F80C /* TemperatureAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DC26E02DD5915E0081F80C /* TemperatureAnimation.swift */; };
 		30DC26F62DD5915E0081F80C /* CutAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DC26D82DD5915E0081F80C /* CutAnimation.swift */; };
 		30DC26F72DD5915E0081F80C /* StirAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DC26DF2DD5915E0081F80C /* StirAnimation.swift */; };
@@ -30,10 +31,10 @@
 		30DC27042DD5915E0081F80C /* CookingARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DC26ED2DD5915E0081F80C /* CookingARView.swift */; };
 		30DC27072DD591D00081F80C /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30DC27062DD591D00081F80C /* ARKit.framework */; };
 		30DC27092DD591E20081F80C /* RealityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30DC27082DD591E20081F80C /* RealityKit.framework */; };
-		30DC270C2DD592D10081F80C /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = 30DC270B2DD592D10081F80C /* GoogleGenerativeAI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3054A64C2DD839C6001E62CC /* CookDetect.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = CookDetect.mlmodel; sourceTree = "<group>"; };
 		30AB0E1D2DD64F2700101557 /* ChefHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChefHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30DC26D52DD5915E0081F80C /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
 		30DC26D62DD5915E0081F80C /* BeatEggAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeatEggAnimation.swift; sourceTree = "<group>"; };
@@ -54,7 +55,6 @@
 		30DC26E72DD5915E0081F80C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		30DC26E92DD5915E0081F80C /* AnimationManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationManger.swift; sourceTree = "<group>"; };
 		30DC26EB2DD5915E0081F80C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		30DC26EC2DD5915E0081F80C /* CookDetect2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = CookDetect2.mlmodel; sourceTree = "<group>"; };
 		30DC26ED2DD5915E0081F80C /* CookingARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookingARView.swift; sourceTree = "<group>"; };
 		30DC27062DD591D00081F80C /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
 		30DC27082DD591E20081F80C /* RealityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealityKit.framework; path = System/Library/Frameworks/RealityKit.framework; sourceTree = SDKROOT; };
@@ -106,7 +106,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30DC270C2DD592D10081F80C /* GoogleGenerativeAI in Frameworks */,
+				3054A64B2DD831B8001E62CC /* GoogleGenerativeAI in Frameworks */,
 				30DC27092DD591E20081F80C /* RealityKit.framework in Frameworks */,
 				30DC27072DD591D00081F80C /* ARKit.framework in Frameworks */,
 			);
@@ -170,12 +170,12 @@
 		30DC26EE2DD5915E0081F80C /* AR */ = {
 			isa = PBXGroup;
 			children = (
+				3054A64C2DD839C6001E62CC /* CookDetect.mlmodel */,
 				30DC26E22DD5915E0081F80C /* Animation */,
 				30DC26E62DD5915E0081F80C /* model */,
 				30DC26E82DD5915E0081F80C /* Preview Content */,
 				30DC26E92DD5915E0081F80C /* AnimationManger.swift */,
 				30DC26EB2DD5915E0081F80C /* ContentView.swift */,
-				30DC26EC2DD5915E0081F80C /* CookDetect2.mlmodel */,
 				30DC26ED2DD5915E0081F80C /* CookingARView.swift */,
 			);
 			path = AR;
@@ -214,7 +214,7 @@
 			);
 			name = ChefHelper;
 			packageProductDependencies = (
-				30DC270B2DD592D10081F80C /* GoogleGenerativeAI */,
+				3054A64A2DD831B8001E62CC /* GoogleGenerativeAI */,
 			);
 			productName = ChefHelper;
 			productReference = 30AB0E1D2DD64F2700101557 /* ChefHelper.app */;
@@ -245,7 +245,7 @@
 			mainGroup = 30D9E04A2DA60DC0001CDE03;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				30DC270A2DD592D10081F80C /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
+				3054A6492DD831B8001E62CC /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 30D9E04A2DA60DC0001CDE03;
@@ -276,7 +276,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30DC26F42DD5915E0081F80C /* CookDetect2.mlmodel in Sources */,
 				30DC26F52DD5915E0081F80C /* TemperatureAnimation.swift in Sources */,
 				30DC26F62DD5915E0081F80C /* CutAnimation.swift in Sources */,
 				30DC26F72DD5915E0081F80C /* StirAnimation.swift in Sources */,
@@ -290,6 +289,7 @@
 				30DC26FF2DD5915E0081F80C /* SprinkleAnimation.swift in Sources */,
 				30DC27002DD5915E0081F80C /* PeelAnimation.swift in Sources */,
 				30DC27012DD5915E0081F80C /* FlameAnimation.swift in Sources */,
+				3054A64D2DD839C6001E62CC /* CookDetect.mlmodel in Sources */,
 				30DC27022DD5915E0081F80C /* PourLiquidAnimation.swift in Sources */,
 				30DC27032DD5915E0081F80C /* ContentView.swift in Sources */,
 				30DC27042DD5915E0081F80C /* CookingARView.swift in Sources */,
@@ -436,10 +436,10 @@
 				DEVELOPMENT_TEAM = 3QR9BMG5N4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = ChefHelper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "需要開啟權限";
+				INFOPLIST_KEY_NSCameraUsageDescription = NSCameraUsageDescription;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要相簿權限";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -472,10 +472,10 @@
 				DEVELOPMENT_TEAM = 3QR9BMG5N4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = ChefHelper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "需要開啟權限";
+				INFOPLIST_KEY_NSCameraUsageDescription = NSCameraUsageDescription;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要相簿權限";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -520,7 +520,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		30DC270A2DD592D10081F80C /* XCRemoteSwiftPackageReference "generative-ai-swift" */ = {
+		3054A6492DD831B8001E62CC /* XCRemoteSwiftPackageReference "generative-ai-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/generative-ai-swift";
 			requirement = {
@@ -531,9 +531,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		30DC270B2DD592D10081F80C /* GoogleGenerativeAI */ = {
+		3054A64A2DD831B8001E62CC /* GoogleGenerativeAI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 30DC270A2DD592D10081F80C /* XCRemoteSwiftPackageReference "generative-ai-swift" */;
+			package = 3054A6492DD831B8001E62CC /* XCRemoteSwiftPackageReference "generative-ai-swift" */;
 			productName = GoogleGenerativeAI;
 		};
 /* End XCSwiftPackageProductDependency section */

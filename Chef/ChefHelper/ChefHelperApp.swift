@@ -7,17 +7,7 @@
 
 import SwiftUI
 
-//@main
-//struct ChefHelperApp: App {
-//    var body: some Scene {
-//        WindowGroup {
-////            ScanningView()
-//            ScanningView(viewModel: ScanningViewModel())
-//
-//        }
-//    }
-//}
-// 
+
 @main
 struct ChefHelperApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -26,6 +16,7 @@ struct ChefHelperApp: App {
         WindowGroup {
 //            ScanningView(viewModel: ScanningViewModel())
             EmptyView() // 不再從這裡開始
+//            ContentView()
         }
     }
 }

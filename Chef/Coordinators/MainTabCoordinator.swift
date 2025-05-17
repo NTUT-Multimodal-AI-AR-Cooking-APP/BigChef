@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI // For UIHostingController
 
+@MainActor
 final class MainTabCoordinator: Coordinator {
     var router: Router // 這個 router 是由 AppCoordinator 傳入的，代表 App 的主導航控制器
     var childCoordinators: [Coordinator] = []

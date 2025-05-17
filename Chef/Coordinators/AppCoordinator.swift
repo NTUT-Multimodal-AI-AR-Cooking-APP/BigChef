@@ -7,6 +7,7 @@
 import UIKit
 import FirebaseAuth // 為了檢查 Auth.auth().currentUser 和登出
 
+@MainActor
 final class AppCoordinator: Coordinator {
     var router: Router
     var childCoordinators: [Coordinator] = []

@@ -29,3 +29,4 @@ fastlane/screenshots
 # Temporary files
 *.tmp
 *.log
+*.plist

@@ -9,5 +9,5 @@ import Foundation
 import Combine
 
 class StepViewModel: ObservableObject {
-    @Published var currentTitle: String = ""
+    @Published var currentDescription: String = ""
 }

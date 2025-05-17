@@ -18,7 +18,7 @@ final class CookViewController: BaseCameraViewController<ARSessionAdapter> {
     private var currentIndex = 0 {
         didSet {
             updateStepLabel()
-            stepViewModel.currentTitle = steps[currentIndex].title
+            stepViewModel.currentDescription = steps[currentIndex].description
         }
     }
 

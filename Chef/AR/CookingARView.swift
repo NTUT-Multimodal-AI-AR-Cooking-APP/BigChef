@@ -18,7 +18,7 @@ struct CookingARView: UIViewRepresentable {
 
     @MainActor
     func updateUIView(_ uiView: ARView, context: Context) {
-        let step = viewModel.currentTitle
+        let step = viewModel.currentDescription
         guard !step.isEmpty, context.coordinator.lastStep != step else { return }
         context.coordinator.lastStep = step
         uiView.scene.anchors.removeAll()

@@ -15,7 +15,7 @@ struct ContentView: View {
                     TextField("輸入烹飪步驟", text: $stepText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button("送出") {
-                        viewModel.currentTitle = stepText
+                        viewModel.currentDescription = stepText
                         stepText = ""
                     }
                 }

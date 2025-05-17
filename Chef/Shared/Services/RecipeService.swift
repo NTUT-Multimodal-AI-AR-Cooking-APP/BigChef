@@ -1,19 +1,19 @@
 import Foundation
 
 enum RecipeService {
-    // MARK: - Constants
-    private static let baseURL = "http://localhost:8080"
-    
-    // MARK: - Recipe Generation
-    static func generateRecipe(
-        using request: SuggestRecipeRequest,
-        completion: @escaping (Result<SuggestRecipeResponse, Error>) -> Void
-    ) {
-        guard let url = URL(string: "\(baseURL)/api/v1/recipe/suggest") else {
-            completion(.failure(NetworkError.invalidURL))
-            return
+    private static var baseURL: String {
+        guard let url = ProcessInfo.processInfo.environment["BASE_URL"] else {
+            fatalError("❌ BASE_URL is not set in the environment variables.")
         }
+        return url
+    }
 
+    // MARK: - 食譜生成 async 函式
+    static func generateRecipe(using request: SuggestRecipeRequest) async throws -> SuggestRecipeResponse {
+        guard let url = URL(string: "\(baseURL)/api/v1/recipe/suggest") else {
+            throw NetworkError.invalidURL
+        }
+        
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -27,60 +27,40 @@ enum RecipeService {
             }
         } catch {
             print("❌ 請求編碼失敗：\(error)")
-            completion(.failure(error))
-            return
+            throw error
         }
+        
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
 
-        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            if let error = error {
-                print("❌ 網路請求失敗：\(error)")
-                completion(.failure(error))
-                return
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("❌ 無效的伺服器回應")
+            throw NetworkError.invalidResponse
+        }
+        
+        guard (200...299).contains(httpResponse.statusCode) else {
+            print("❌ HTTP 錯誤：\(httpResponse.statusCode)")
+            throw NetworkError.httpError(httpResponse.statusCode)
+        }
+        
+        do {
+            let decoded = try JSONDecoder().decode(SuggestRecipeResponse.self, from: data)
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("✅ AI 回傳食譜：\n\(jsonString)")
             }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                print("❌ 無效的伺服器回應")
-                completion(.failure(NetworkError.invalidResponse))
-                return
+            return decoded
+        } catch {
+            if let raw = String(data: data, encoding: .utf8) {
+                print("🔴 AI 回傳原始資料：\n\(raw)")
             }
-            
-            guard (200...299).contains(httpResponse.statusCode) else {
-                print("❌ HTTP 錯誤：\(httpResponse.statusCode)")
-                completion(.failure(NetworkError.httpError(httpResponse.statusCode)))
-                return
-            }
-            
-            guard let data = data else {
-                print("❌ 沒有收到資料")
-                completion(.failure(NetworkError.noData))
-                return
-            }
-            
-            do {
-                let decoded = try JSONDecoder().decode(SuggestRecipeResponse.self, from: data)
-                if let jsonString = String(data: data, encoding: .utf8) {
-                    print("✅ AI 回傳食譜：\n\(jsonString)")
-                }
-                completion(.success(decoded))
-            } catch {
-                if let raw = String(data: data, encoding: .utf8) {
-                    print("🔴 AI 回傳原始資料：\n\(raw)")
-                }
-                print("❌ 解碼失敗：\(error)")
-                completion(.failure(error))
-            }
-        }.resume()
+            print("❌ 解碼失敗：\(error)")
+            throw error
+        }
     }
-    
-    // MARK: - Image Scanning
-    static func scanImage(
-        using request: ScanImageRequest,
-        completion: @escaping (Result<ScanImageResponse, Error>) -> Void
-    ) {
+    // MARK: - 掃描圖片為食材與設備
+    static func scanImageForIngredients(using request: ScanImageRequest) async throws -> ScanImageResponse {
         guard let url = URL(string: "\(baseURL)/api/v1/recipe/ingredient") else {
             print("❌ 無效的 URL")
-            completion(.failure(NetworkError.invalidURL))
-            return
+            throw NetworkError.invalidURL
         }
         
         var urlRequest = URLRequest(url: url)
@@ -91,7 +71,6 @@ enum RecipeService {
             let jsonData = try JSONEncoder().encode(request)
             urlRequest.httpBody = jsonData
             
-            // 只打印請求的描述提示，不打印圖片數據
             let requestInfo = """
             🟢 發送圖片掃描請求：
             描述提示：\(request.description_hint)
@@ -100,52 +79,37 @@ enum RecipeService {
             print(requestInfo)
         } catch {
             print("❌ 請求編碼失敗：\(error)")
-            completion(.failure(error))
-            return
+            throw error
         }
         
-        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            if let error = error {
-                print("❌ 網路請求失敗：\(error)")
-                completion(.failure(error))
-                return
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("❌ 無效的伺服器回應")
+            throw NetworkError.invalidResponse
+        }
+        
+        guard (200...299).contains(httpResponse.statusCode) else {
+            print("❌ HTTP 錯誤：\(httpResponse.statusCode)")
+            throw NetworkError.httpError(httpResponse.statusCode)
+        }
+        
+        do {
+            let decoded = try JSONDecoder().decode(ScanImageResponse.self, from: data)
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("✅ AI 回傳掃描結果：\n\(jsonString)")
+                print("📝 識別摘要：\(decoded.summary)")
+                print("🥬 識別出 \(decoded.ingredients.count) 個食材")
+                print("🔧 識別出 \(decoded.equipment.count) 個設備")
             }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                print("❌ 無效的伺服器回應")
-                completion(.failure(NetworkError.invalidResponse))
-                return
+            return decoded
+        } catch {
+            if let raw = String(data: data, encoding: .utf8) {
+                print("🔴 AI 回傳原始資料：\n\(raw)")
             }
-            
-            guard (200...299).contains(httpResponse.statusCode) else {
-                print("❌ HTTP 錯誤：\(httpResponse.statusCode)")
-                completion(.failure(NetworkError.httpError(httpResponse.statusCode)))
-                return
-            }
-            
-            guard let data = data else {
-                print("❌ 沒有收到資料")
-                completion(.failure(NetworkError.noData))
-                return
-            }
-            
-            do {
-                let response = try JSONDecoder().decode(ScanImageResponse.self, from: data)
-                if let jsonString = String(data: data, encoding: .utf8) {
-                    print("✅ AI 回傳掃描結果：\n\(jsonString)")
-                    print("📝 識別摘要：\(response.summary)")
-                    print("🥬 識別出 \(response.ingredients.count) 個食材")
-                    print("🔧 識別出 \(response.equipment.count) 個設備")
-                }
-                completion(.success(response))
-            } catch {
-                if let raw = String(data: data, encoding: .utf8) {
-                    print("🔴 AI 回傳原始資料：\n\(raw)")
-                }
-                print("❌ 解碼失敗：\(error)")
-                completion(.failure(error))
-            }
-        }.resume()
+            print("❌ 解碼失敗：\(error)")
+            throw error
+        }
     }
 }
 
@@ -155,6 +119,7 @@ enum NetworkError: LocalizedError {
     case invalidResponse
     case httpError(Int)
     case noData
+    case unknown(String)
     
     var errorDescription: String? {
         switch self {
@@ -166,6 +131,8 @@ enum NetworkError: LocalizedError {
             return "HTTP 錯誤：\(code)"
         case .noData:
             return "沒有收到資料"
+        case .unknown(let message):
+            return "未知錯誤：\(message)"
         }
     }
-} 
+}

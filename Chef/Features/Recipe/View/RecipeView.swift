@@ -8,6 +8,7 @@ import SwiftUI
 
 struct RecipeView: View {
     @ObservedObject var viewModel: RecipeViewModel
+    @EnvironmentObject var coordinator: RecipeCoordinator
 
     var body: some View {
         VStack(spacing: 16) {
@@ -73,7 +74,6 @@ struct RecipeView: View {
             // 按鈕區拉出來，不跟著 ScrollView 滾動
             Button(action: {
                 viewModel.cookButtonTapped()
-                // 將跳轉 CameraCookingView 的邏輯放這裡
             }) {
                 Text("開始烹飪")
                     .foregroundColor(.white)
@@ -133,4 +133,5 @@ struct RecipeView: View {
 
     let viewModel = RecipeViewModel(response: response)
     return RecipeView(viewModel: viewModel)
+        .environmentObject(RecipeCoordinator(navigationController: UINavigationController()))
 }

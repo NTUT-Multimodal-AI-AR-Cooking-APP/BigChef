@@ -13,16 +13,16 @@ struct PreferenceView: View {
                 Text("製作方式（選填）")
                     .font(.headline)
                 TextField("例如：煎、炒、煮...", text: $cookingMethod)
-                    .textFieldStyle(.roundedBorder)
-                    .autocorrectionDisabled(true)
+                .textFieldStyle(.roundedBorder)
+                .autocorrectionDisabled(true)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("飲食限制（選填）")
                     .font(.headline)
                 TextField("例如：無麩質、素食...", text: $dietaryRestrictionsInput)
-                    .textFieldStyle(.roundedBorder)
-                    .autocorrectionDisabled(true)
+                .textFieldStyle(.roundedBorder)
+                .autocorrectionDisabled(true)
             }
 
             HStack {

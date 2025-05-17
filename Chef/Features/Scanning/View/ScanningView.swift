@@ -3,11 +3,13 @@ import SwiftUI
 // MARK: - Models
 struct ScanningState {
     var preference = Preference(
-        cooking_method: "",
+        cooking_method: "一般烹調",  // 預設值
         dietary_restrictions: [],
         serving_size: "1人份"
     )
     var activeSheet: ScanningSheet?
+    var showCompletionAlert = false
+    var scanSummary = ""
 }
 
 // MARK: - Sheet Type
@@ -27,19 +29,18 @@ enum ScanningSheet: Identifiable {
 struct ScanningView: View {
     @StateObject private var viewModel: ScanningViewModel
     @State private var state: ScanningState
-    @State private var showCompletionAlert = false
-    @State private var scanSummary = ""
+    @EnvironmentObject private var coordinator: ScanningCoordinator
     
     init(
-        viewModel: ScanningViewModel = ScanningViewModel(),
+        viewModel: ScanningViewModel,
         initialState: ScanningState = ScanningState()
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-        _state = State(initialValue: initialState)
+        self._viewModel = StateObject(wrappedValue: viewModel)
+        self._state = State(initialValue: initialState)
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 28) {
                     logoView
@@ -51,23 +52,56 @@ struct ScanningView: View {
                 .padding()
             }
             .navigationTitle("Recipe Generator")
-            .sheet(item: $state.activeSheet, content: sheetContent)
-            .sheet(isPresented: $viewModel.isShowingImagePreview) {
-                imagePreviewSheet
+            .navigationBarTitleDisplayMode(.large)
+            .sheet(item: $state.activeSheet) { sheet in
+                sheetContent(for: sheet)
             }
-            .alert("掃描完成", isPresented: $showCompletionAlert) {
-                Button("完成") {
+            .sheet(isPresented: $viewModel.isShowingImagePreview) {
+                if let image = viewModel.selectedImage {
+                    ImagePreviewView(
+                        image: image,
+                        descriptionHint: $viewModel.descriptionHint,
+                        onScan: {
+                            Task {
+                                let request = ScanImageRequest(
+                                    image: ImageCompressor.compressToBase64(image: image) ?? "",
+                                    description_hint: viewModel.descriptionHint
+                                )
+                                await viewModel.scanImage(request: request)
+                            }
+                        }
+                    )
+                    .onAppear {
+                        setupScanCompletionHandler()
+                    }
+                }
+            }
+            .alert("掃描完成", isPresented: $state.showCompletionAlert) {
+                Button("完成", role: .cancel) {
                     cleanupAfterScan()
                 }
             } message: {
-                Text(scanSummary)
+                Text(state.scanSummary)
             }
-            .loadingOverlay(isLoading: viewModel.isLoading)
+            .overlay {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(.ultraThinMaterial)
+                }
+            }
             .imageSourcePicker(
                 isPresented: $viewModel.isShowingImagePicker,
                 selectedImage: $viewModel.selectedImage,
-                onImageSelected: viewModel.handleSelectedImage
+                onImageSelected: { image in
+                    viewModel.selectedImage = image
+                    viewModel.isShowingImagePreview = true
+                }
             )
+            .onAppear {
+                setupRecipeNavigationHandler()
+            }
         }
     }
     
@@ -88,7 +122,11 @@ struct ScanningView: View {
             equipment: $viewModel.equipment,
             onAdd: { state.activeSheet = .equipment(Equipment.empty) },
             onEdit: { equipment in state.activeSheet = .equipment(equipment) },
-            onDelete: { equipment in viewModel.removeEquipment(equipment) }
+            onDelete: { equipment in
+                withAnimation(.easeInOut) {
+                    viewModel.removeEquipment(equipment)
+                }
+            }
         )
     }
     
@@ -97,7 +135,11 @@ struct ScanningView: View {
             ingredients: $viewModel.ingredients,
             onAdd: { state.activeSheet = .ingredient(Ingredient.empty) },
             onEdit: { ingredient in state.activeSheet = .ingredient(ingredient) },
-            onDelete: { ingredient in viewModel.removeIngredient(ingredient) }
+            onDelete: { ingredient in
+                withAnimation(.easeInOut) {
+                    viewModel.removeIngredient(ingredient)
+                }
+            }
         )
     }
     
@@ -120,36 +162,51 @@ struct ScanningView: View {
     
     private var actionButtons: some View {
         ActionButtonsView(
-            onScan: { viewModel.scanButtonTapped() },
-            onGenerate: { viewModel.generateRecipe(with: state.preference) }
+            onScan: {
+                viewModel.isShowingImagePicker = true
+            },
+            onGenerate: {
+                Task {
+                    await viewModel.generateRecipe(with: state.preference)
+                }
+            }
         )
     }
     
-    private var imagePreviewSheet: some View {
-        Group {
-            if let image = viewModel.selectedImage {
-                ImagePreviewView(
-                    image: image,
-                    descriptionHint: $viewModel.descriptionHint,
-                    onScan: {
-                        viewModel.scanImage()
+    // MARK: - Helper Methods
+    
+    private func setupScanCompletionHandler() {
+        viewModel.onScanCompleted = { response, summary in
+            Task { @MainActor in
+                // 更新食材列表
+                for ingredient in response.ingredients {
+                    withAnimation(.easeInOut) {
+                        viewModel.upsertIngredient(ingredient)
                     }
-                )
-                .onAppear {
-                    // 設置掃描完成的回調
-                    viewModel.setScanCompleteHandler { summary in
-                        // 關閉預覽視圖
-                        viewModel.isShowingImagePreview = false
-                        // 顯示完成提示
-                        scanSummary = summary
-                        showCompletionAlert = true
+                }
+                
+                // 更新設備列表
+                for equipment in response.equipment {
+                    withAnimation(.easeInOut) {
+                        viewModel.upsertEquipment(equipment)
                     }
+                }
+                
+                // 更新 UI 狀態
+                withAnimation {
+                    viewModel.isShowingImagePreview = false
+                    state.scanSummary = summary
+                    state.showCompletionAlert = true
                 }
             }
         }
     }
     
-    // MARK: - Helper Methods
+    private func setupRecipeNavigationHandler() {
+        viewModel.onNavigateToRecipe = { [weak coordinator] recipe in
+            coordinator?.showRecipeDetail(recipe)
+        }
+    }
     
     @ViewBuilder
     private func sheetContent(for sheet: ScanningSheet) -> some View {
@@ -158,13 +215,23 @@ struct ScanningView: View {
             let binding = binding(for: ingredient, in: $viewModel.ingredients)
             IngredientEditView(
                 ingredient: binding,
-                onSave: { viewModel.upsertIngredient(binding.wrappedValue) }
+                onSave: {
+                    withAnimation(.easeInOut) {
+                        viewModel.upsertIngredient(binding.wrappedValue)
+                        state.activeSheet = nil
+                    }
+                }
             )
         case .equipment(let equipment):
             let binding = binding(for: equipment, in: $viewModel.equipment)
             EquipmentEditView(
                 equipment: binding,
-                onSave: { viewModel.upsertEquipment(binding.wrappedValue) }
+                onSave: {
+                    withAnimation(.easeInOut) {
+                        viewModel.upsertEquipment(binding.wrappedValue)
+                        state.activeSheet = nil
+                    }
+                }
             )
         }
     }
@@ -175,10 +242,7 @@ struct ScanningView: View {
     ) -> Binding<T> {
         Binding(
             get: {
-                if let index = array.wrappedValue.firstIndex(where: { $0.id == item.id }) {
-                    return array.wrappedValue[index]
-                }
-                return item
+                array.wrappedValue.first(where: { $0.id == item.id }) ?? item
             },
             set: { newValue in
                 if let index = array.wrappedValue.firstIndex(where: { $0.id == item.id }) {
@@ -191,23 +255,11 @@ struct ScanningView: View {
     }
     
     private func cleanupAfterScan() {
-        viewModel.selectedImage = nil
-        viewModel.descriptionHint = ""
-        showCompletionAlert = false
-        scanSummary = ""
-    }
-}
-
-// MARK: - View Extensions
-private extension View {
-    func loadingOverlay(isLoading: Bool) -> some View {
-        overlay {
-            if isLoading {
-                ProgressView()
-                    .scaleEffect(1.5)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.2))
-            }
+        Task { @MainActor in
+            viewModel.selectedImage = nil
+            viewModel.descriptionHint = ""
+            state.showCompletionAlert = false
+            state.scanSummary = ""
         }
     }
 }
@@ -226,74 +278,40 @@ private extension Equipment {
 }
 
 // MARK: - Preview
-#Preview {
-    let sampleViewModel = ScanningViewModel()
-    sampleViewModel.ingredients = [
-        Ingredient(
-            name: "蛋",
-            type: "蛋類",
-            amount: "2",
-            unit: "顆",
-            preparation: "打散"
+struct ScanningView_Previews: PreviewProvider {
+    @MainActor
+    static var previews: some View {
+        let viewModel = ScanningViewModel()
+        viewModel.ingredients = [
+            Ingredient(
+                name: "蛋",
+                type: "蛋類",
+                amount: "2",
+                unit: "顆",
+                preparation: "打散"
+            )
+        ]
+        viewModel.equipment = [
+            Equipment(
+                name: "平底鍋",
+                type: "鍋具",
+                size: "小型",
+                material: "不沾",
+                power_source: "電"
+            )
+        ]
+        
+        return ScanningView(
+            viewModel: viewModel,
+            initialState: ScanningState(
+                preference: Preference(
+                    cooking_method: "煎",
+                    dietary_restrictions: ["無麩質"],
+                    serving_size: "1人份"
+                )
+            )
         )
-    ]
-    sampleViewModel.equipment = [
-        Equipment(
-            name: "平底鍋",
-            type: "鍋具",
-            size: "小型",
-            material: "不沾",
-            power_source: "電"
-        )
-    ]
-    
-    let initialState = ScanningState(
-        preference: Preference(
-            cooking_method: "煎",
-            dietary_restrictions: ["無麩質"],
-            serving_size: "1人份"
-        )
-    )
-    
-    return ScanningView(
-        viewModel: sampleViewModel,
-        initialState: initialState
-    )
-}
-
-// MARK: - Sample Data Preview
-#Preview("Sample Data") {
-    let sampleViewModel = ScanningViewModel()
-    sampleViewModel.ingredients = [
-        Ingredient(
-            name: "蛋",
-            type: "蛋類",
-            amount: "2",
-            unit: "顆",
-            preparation: "打散"
-        )
-    ]
-    sampleViewModel.equipment = [
-        Equipment(
-            name: "平底鍋",
-            type: "鍋具",
-            size: "小型",
-            material: "不沾",
-            power_source: "電"
-        )
-    ]
-    
-    let initialState = ScanningState(
-        preference: Preference(
-            cooking_method: "煎",
-            dietary_restrictions: ["無麩質"],
-            serving_size: "1人份"
-        )
-    )
-    
-    return ScanningView(
-        viewModel: sampleViewModel,
-        initialState: initialState
-    )
+        .preferredColorScheme(.light)
+    }
 }
 

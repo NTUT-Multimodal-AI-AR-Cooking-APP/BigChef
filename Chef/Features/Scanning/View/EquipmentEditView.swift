@@ -5,7 +5,7 @@ struct EquipmentListView: View {
     var onAdd: () -> Void
     var onEdit: (Equipment) -> Void
     var onDelete: (Equipment) -> Void
-    
+
     var body: some View {
         CommonListView(
             title: "Equipment",
@@ -15,13 +15,13 @@ struct EquipmentListView: View {
             onEdit: onEdit,
             onDelete: onDelete
         )
-    }
-}
+                }
+            }
 
 struct EquipmentEditView: View {
     @Binding var equipment: Equipment
     var onSave: () -> Void
-    
+
     var body: some View {
         CommonEditView(
             title: equipment.name.isEmpty ? "Add Equipment" : "Edit Equipment",

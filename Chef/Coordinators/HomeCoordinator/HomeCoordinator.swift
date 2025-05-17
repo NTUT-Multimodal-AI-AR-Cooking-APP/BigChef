@@ -1,24 +1,26 @@
 //
-//  HomeCoordinator.swift
-//  ChefHelper
-//
-//  Created by 陳泓齊 on 2025/5/3.
-//
+ //  HomeCoordinator.swift
+ //  ChefHelper
+ //
+ //  Created by 陳泓齊 on 2025/5/3.
+ //
 
-import UIKit
-import SwiftUI
+ import UIKit
+ import SwiftUI
 
-final class HomeCoordinator: Coordinator {
-    var childCoordinators: [Coordinator] = []
-    private unowned let nav: UINavigationController
-    
-    init(nav: UINavigationController) { self.nav = nav }
+ @MainActor
+ final class HomeCoordinator: Coordinator {
+     var childCoordinators: [Coordinator] = []
+     var navigationController: UINavigationController
 
-    func start() {
-        let vm = HomeViewModel()
-        let view = HomeView(viewModel: vm)
-        let page = UIHostingController(rootView: view)
-        nav.setNavigationBarHidden(true, animated: false)
-        nav.pushViewController(page, animated: false)
-    }
-}
+     init(navigationController: UINavigationController) {
+         self.navigationController = navigationController
+     }
+
+     func start() {
+         let vc = UIViewController()
+         vc.view.backgroundColor = .systemBackground
+         vc.title = "Home (stub)"
+         navigationController.pushViewController(vc, animated: false)
+     }
+ }

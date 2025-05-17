@@ -10,6 +10,7 @@ import UIKit
 
 /// 掃描設備 / 食材畫面：
 /// 目前只先顯示 AR 預覽，日後再加掃描框、Vision OCR 等功能
+@MainActor
 final class ScanViewController: BaseCameraViewController<ARSessionAdapter> {
 
     private let viewModel = ScanningViewModel()
@@ -38,11 +39,13 @@ final class ScanViewController: BaseCameraViewController<ARSessionAdapter> {
         ])
 
         // 使用空的偏好設定初始化
-        let emptyPreference = Preference(
-            cooking_method: "",
-            dietary_restrictions: [],
-            serving_size: "1人份"
-        )
-        viewModel.generateRecipe(with: emptyPreference)
+        Task {
+            let emptyPreference = Preference(
+                cooking_method: "",
+                dietary_restrictions: [],
+                serving_size: "1人份"
+            )
+            await viewModel.generateRecipe(with: emptyPreference)
+        }
     }
 }

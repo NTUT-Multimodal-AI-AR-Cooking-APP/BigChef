@@ -8,31 +8,31 @@
 // Sources/Features/Camera/CameraCoordinator.swift
 // Sources/Coordinators/Camera/CameraCoordinator.swift
 import UIKit
+import SwiftUI
 
-final class CameraCoordinator: Coordinator {
+@MainActor
+final class CameraCoordinator: Coordinator, ObservableObject {
 
     var childCoordinators: [Coordinator] = []
-    private let nav: UINavigationController
+    var navigationController: UINavigationController
 
     /// 當相機流程結束時，讓父協調器可以把它移除
     var onFinish: (() -> Void)?
 
-    init(nav: UINavigationController) {
-        self.nav = nav
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
 
-    
     func start() {
         let cameraVC = ARCameraViewController(steps: [])
         cameraVC.title = "Camera"
 
-        // 右上角 Close ⇒ 用 navigationItem 搭配 pop
         cameraVC.navigationItem.rightBarButtonItem = UIBarButtonItem(
             systemItem: .close,
             primaryAction: UIAction { [weak self] _ in self?.close() }
         )
 
-        nav.pushViewController(cameraVC, animated: true)
+        navigationController.pushViewController(cameraVC, animated: true)
     }
 
     /// Start cooking camera flow with recipe steps
@@ -45,20 +45,22 @@ final class CameraCoordinator: Coordinator {
             primaryAction: UIAction { [weak self] _ in self?.close() }
         )
 
-        nav.pushViewController(cameraVC, animated: true)
+        navigationController.pushViewController(cameraVC, animated: true)
     }
-    func startScanning() {
-       let vc = ScanViewController()
-       nav.pushViewController(vc, animated: true)
-   }
 
-   // 烹飪流程（帶步驟）
-    func startCooking(with steps: [RecipeStep]) {
-       let vc = CookViewController(steps: steps)
-       nav.pushViewController(vc, animated: true)
+    func startScanning() {
+        let vc = ScanViewController()
+        navigationController.pushViewController(vc, animated: true)
     }
+
+    // 烹飪流程（帶步驟）
+    func startCooking(with steps: [RecipeStep]) {
+        let vc = CookViewController(steps: steps)
+        navigationController.pushViewController(vc, animated: true)
+    }
+
     private func close() {
-        nav.popViewController(animated: true)
+        navigationController.popViewController(animated: true)
         onFinish?()
     }
 }

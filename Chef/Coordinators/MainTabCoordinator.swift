@@ -7,87 +7,117 @@
 
 import UIKit
 import SwiftUICore
+import SwiftUI
 
-final class MainTabCoordinator: Coordinator {
+@MainActor
+final class MainTabCoordinator: Coordinator, ObservableObject {
 
     // MARK: - Properties
     var childCoordinators: [Coordinator] = []
     /// 提供給 AppCoordinator 當 rootViewController
 
-    private let nav : UINavigationController
-    init(nav: UINavigationController) { self.nav = nav }
+    var navigationController: UINavigationController
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+    }
     
     // MARK: - Public
     func start() {
-        startFlow()
+        let tabView = TabView {
+            // Recipe Tab
+            NavigationStack {
+                RecipeTabView(coordinator: self)
+            }
+            .tabItem {
+                Label("Recipes", systemImage: "book.fill")
+            }
+            
+            // Scanning Tab
+            NavigationStack {
+                ScanningTabView(coordinator: self)
+            }
+            .tabItem {
+                Label("Scan", systemImage: "camera.fill")
+            }
+            
+            // Settings Tab
+            NavigationStack {
+                SettingsView()
+            }
+            .tabItem {
+                Label("Settings", systemImage: "gear")
+            }
+        }
+        
+        let hostingController = UIHostingController(rootView: tabView)
+        navigationController.setViewControllers([hostingController], animated: false)
     }
     
-    private func startFlow() {
-        let tabBar = UITabBarController()
-        tabBar.viewControllers = [
-            makeHomeTab(),
-            makeScanningTab(),
-            makeHistoryTab()
-        ]
-        tabBar.selectedIndex = 0
-        tabBar.tabBar.backgroundColor = UIColor.brandOrange
-        tabBar.tabBar.isTranslucent = false
-        // Unify standard and scroll‑edge appearance colors
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor.brandOrange
-        tabBar.tabBar.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            tabBar.tabBar.scrollEdgeAppearance = appearance
+    // MARK: - Navigation Methods
+    
+    func showRecipeDetail(_ recipe: SuggestRecipeResponse) {
+        let coordinator = RecipeCoordinator(navigationController: navigationController)
+        addChildCoordinator(coordinator)
+        coordinator.showRecipeDetail(recipe)
+    }
+    
+    func showScanning() {
+        let coordinator = ScanningCoordinator(navigationController: navigationController)
+        addChildCoordinator(coordinator)
+        coordinator.start()
+    }
+    
+    func showCamera() {
+        let coordinator = CameraCoordinator(navigationController: navigationController)
+        addChildCoordinator(coordinator)
+        coordinator.start()
+    }
+}
+
+// MARK: - Tab Views
+
+private struct RecipeTabView: View {
+    @ObservedObject var coordinator: MainTabCoordinator
+    @State private var recipeCoordinator: RecipeCoordinator?
+    
+    var body: some View {
+        Group {
+            if let recipeCoordinator = recipeCoordinator {
+                RecipeView(viewModel: RecipeViewModel(response: SuggestRecipeResponse(
+                    dish_name: "",
+                    dish_description: "",
+                    ingredients: [],
+                    equipment: [],
+                    recipe: []
+                )))
+                .environmentObject(recipeCoordinator)
+            } else {
+                ProgressView()
+                    .onAppear {
+                        recipeCoordinator = RecipeCoordinator(navigationController: coordinator.navigationController)
+                        coordinator.addChildCoordinator(recipeCoordinator!)
+                    }
+            }
         }
-        tabBar.tabBar.tintColor = .white
-        nav.setViewControllers([tabBar], animated: false)
     }
+}
 
-    // MARK: - Private - 工具
-    private func makeHomeTab() -> UIViewController {
-        let nav = UINavigationController()
-        nav.tabBarItem = UITabBarItem(
-            title: "Home",
-            image: UIImage(systemName: "house"),
-            tag: 0
-        )
-
-        // 建立並啟動 Home Flow
-        let home = HomeCoordinator(nav: nav)     // ← 如果你還沒寫 HomeCoordinator，先用假協調器
-        store(home)
-        home.start()
-
-        return nav
-    }
-
-    private func makeScanningTab() -> UIViewController {
-        let nav = UINavigationController()
-        nav.tabBarItem = UITabBarItem(
-            title: "Scan",
-            image: UIImage(systemName: "viewfinder"),
-            tag: 1
-        )
-
-        let scan = ScanningCoordinator(nav: nav)
-        store(scan)
-        scan.start()
-
-        return nav
-    }
-
-    private func makeHistoryTab() -> UIViewController {
-        let nav = UINavigationController()
-        nav.tabBarItem = UITabBarItem(
-            title: "History",
-            image: UIImage(systemName: "clock.arrow.circlepath"),
-            tag: 2
-        )
-
-        let history = HistoryCoordinator(nav: nav)
-        store(history)
-        history.start()
-
-        return nav
+private struct ScanningTabView: View {
+    @ObservedObject var coordinator: MainTabCoordinator
+    @State private var scanningCoordinator: ScanningCoordinator?
+    
+    var body: some View {
+        Group {
+            if let scanningCoordinator = scanningCoordinator {
+                ScanningView(viewModel: ScanningViewModel())
+                    .environmentObject(scanningCoordinator)
+            } else {
+                ProgressView()
+                    .onAppear {
+                        scanningCoordinator = ScanningCoordinator(navigationController: coordinator.navigationController)
+                        coordinator.addChildCoordinator(scanningCoordinator!)
+                    }
+            }
+        }
     }
 }

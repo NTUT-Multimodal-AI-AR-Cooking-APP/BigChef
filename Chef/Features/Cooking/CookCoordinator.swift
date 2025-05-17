@@ -8,8 +8,14 @@
 
 import UIKit
 
+@MainActor
 final class CookCoordinator: Coordinator {
-    var childCoordinators: [any Coordinator] = []
+    var childCoordinators: [Coordinator] = []
+    var navigationController: UINavigationController
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+    }
     
     func start() {
         // This coordinator must be started with recipe steps.
@@ -17,11 +23,8 @@ final class CookCoordinator: Coordinator {
         assertionFailure("CookCoordinator.start() called without steps – use start(with:) instead.")
     }
     
-    private let nav: UINavigationController
-    init(nav: UINavigationController) { self.nav = nav }
-
     func start(with steps: [RecipeStep]) {
         let vc = CookViewController(steps: steps)
-        nav.pushViewController(vc, animated: true)
+        navigationController.pushViewController(vc, animated: true)
     }
 }

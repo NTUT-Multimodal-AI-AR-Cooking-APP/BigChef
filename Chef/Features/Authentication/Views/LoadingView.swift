@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct LoadingView: View {
+    @EnvironmentObject var viewModel: AuthViewModel
     var body: some View {
         ZStack {
             Image("LoadingBg")

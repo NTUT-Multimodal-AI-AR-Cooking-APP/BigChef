@@ -1,25 +1,11 @@
-//
-//  HomeCoordinator.swift
-//  ChefHelper
-//
-//  Created by 陳泓齊 on 2025/5/3.
-//
+struct HomeView: View {
+    let viewModel: HomeViewModel
 
-import UIKit
-
-@MainActor
-final class HomeCoordinator: Coordinator {
-    var childCoordinators: [Coordinator] = []
-    var navigationController: UINavigationController
-    
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
-    }
-    
-    func start() {
-        let vc = UIViewController()
-        vc.view.backgroundColor = .systemBackground
-        vc.title = "Home (stub)"
-        navigationController.pushViewController(vc, animated: false)
+    var body: some View {
+        Text("🏠 Home")
+            .font(.largeTitle)
+            .padding()
     }
 }
+
+final class HomeViewModel: ObservableObject { }

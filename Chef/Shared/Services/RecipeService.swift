@@ -119,6 +119,7 @@ enum NetworkError: LocalizedError {
     case invalidResponse
     case httpError(Int)
     case noData
+    case unknown(String)
     
     var errorDescription: String? {
         switch self {
@@ -130,6 +131,8 @@ enum NetworkError: LocalizedError {
             return "HTTP 錯誤：\(code)"
         case .noData:
             return "沒有收到資料"
+        case .unknown(let message):
+            return "未知錯誤：\(message)"
         }
     }
 }

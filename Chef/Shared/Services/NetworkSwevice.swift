@@ -36,11 +36,11 @@ final class NetworkService: NetworkServiceProtocol {
                     if case let .failure(error) = completion {
                         switch error {
                         case let decodingError as DecodingError:
-                            promise(.failure(decodingError))
+                            promise(.failure(NetworkError.unknown("解碼錯誤：\(decodingError.localizedDescription)")))
                         case let apiError as NetworkError:
                             promise(.failure(apiError))
                         default:
-                            promise(.failure(NetworkError.unknown))
+                            promise(.failure(NetworkError.unknown(error.localizedDescription)))
                         }
                     }
                 } receiveValue: { promise(.success($0)) }

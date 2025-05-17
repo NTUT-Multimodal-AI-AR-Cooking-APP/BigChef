@@ -1,1 +1,49 @@
+# macOS 系統檔案
 .DS_Store
+
+# Xcode
+build/
+DerivedData/
+*.xcworkspace
+!default.xcworkspace
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+Packages/
+.swiftpm/
+
+# CocoaPods
+Pods/
+podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# SwiftLint
+.swiftlint.yml
+
+# User-specific files
+*.swp
+*~
+*.tmp
+
+# Archive
+*.xcarchive
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Certificates, provisioning profiles
+*.cer
+*.mobileprovision
+*.p12

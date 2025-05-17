@@ -9,6 +9,24 @@
 // 路徑: ntut-multimodal-ai-ar-cooking-app/bigchef/BigChef-main/Chef/Features/Home/ViewModels/HomeViewModel.swift
 import Foundation
 import Combine
+import SwiftUI
+
+// MARK: - View State
+enum ViewState {
+    case loading
+    case error(message: String)
+    case dataLoaded
+}
+
+// MARK: - Strings
+enum Strings {
+    static let somethingWentWrong = "Something went wrong!"
+    static let requestTimeout = "Request timeout, please retry"
+    static let fetchingRecords = "Fetching dishes, Please Be Patient"
+    static let fetchingMoreRecords = "Fetching more records"
+    static let noInternet = "Internet not available, please check internet connection"
+    static let noCharactersFound = "No character found!"
+}
 
 final class HomeViewModel: ObservableObject {
 

@@ -1,13 +1,14 @@
 //
-//  HomeCoordinator.swift
-//  ChefHelper
-//
-//  Created by 陳泓齊 on 2025/5/3.
-//
+ //  HomeCoordinator.swift
+ //  ChefHelper
+ //
+ //  Created by 陳泓齊 on 2025/5/3.
+ //
 
 import UIKit
 import SwiftUI // For UIHostingController
 
+@MainActor
 final class HomeCoordinator: Coordinator {
     var router: Router
     var childCoordinators: [Coordinator] = []

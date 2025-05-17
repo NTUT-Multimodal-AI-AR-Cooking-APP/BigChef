@@ -9,6 +9,7 @@ import FirebaseAuth // 為了檢查 Auth.auth().currentUser 和登出
 
 @MainActor
 final class AppCoordinator: Coordinator {
+<<<<<<< HEAD
     var router: Router
     var childCoordinators: [Coordinator] = []
 
@@ -118,5 +119,18 @@ final class AppCoordinator: Coordinator {
         authCoordinator.start(animated: animated) // 'animated' 參數會傳遞給 AuthCoordinator 的 start 方法
                                                  // AuthCoordinator 的 start 方法內部會呼叫 router.setRootViewController
         print("AppCoordinator: AuthCoordinator 已啟動，它將設定自己的根視圖。")
+=======
+    var childCoordinators: [Coordinator] = []
+    var navigationController: UINavigationController
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+    }
+    
+    func start() {
+        let main = MainTabCoordinator(navigationController: navigationController)
+        addChildCoordinator(main)
+        main.start()
+>>>>>>> upstream/allan-brach
     }
 }

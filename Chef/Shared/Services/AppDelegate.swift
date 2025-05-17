@@ -8,6 +8,8 @@
 // Chef/Shared/Services/AppDelegate.swift
 import UIKit
 import Firebase
+
+@MainActor
 class AppDelegate: NSObject, UIApplicationDelegate, UIWindowSceneDelegate { // 確保遵從協定
 
     var window: UIWindow?

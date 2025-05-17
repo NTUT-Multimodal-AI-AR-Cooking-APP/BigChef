@@ -9,6 +9,7 @@
 import UIKit
 import SwiftUI // For UIHostingController
 
+@MainActor
 final class HistoryCoordinator: Coordinator {
     var router: Router
     var childCoordinators: [Coordinator] = []

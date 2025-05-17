@@ -18,6 +18,7 @@ struct LoginView: View {
         VStack(spacing: 20) {
             // App Logo & Title
             Image("QuickFeatLogo")
+            
             // Email Field
             CustomInputField(imageName: "envelope",
                              placeholderText: "Email",
@@ -33,18 +34,10 @@ struct LoginView: View {
                              isSecureField: true,
                              text: $password)
         }.padding(32)
-            // Forgot Password
-//            HStack {
-//                Spacer()
-//                Button(action: {
-//                    // Handle forgot password
-//                }) {
-//                    Text("Forgot your password?")
-//                        .font(.largeTitle)
-//                        .foregroundColor(.brandOrange)
-//                }
-//                .padding(.trailing, 30)
-//            }
+        
+        // TODO: Implement forgot password functionality
+        // Button("Forgot your password?") { ... }
+        
         Button {
             print("Sign in")
             viewModel.login(withEmail: email, password: password)
@@ -58,64 +51,34 @@ struct LoginView: View {
                 .padding()
         }
         .shadow(color: .gray.opacity(0.5), radius: 10, x: 0, y: 0)
-//            // Login Button
-//            Button {
-//                print("Sign in")
-//                viewModel.login(withEmail: email, password: password)
-//            } label:{
-//                Text("LOG IN")
-//                    .font(.headline)
-//                    .foregroundColor(.white)
-//                    .frame(maxWidth: .infinity)
-//                    .padding()
-//                    .background(Color.brandOrange)
-//                    .cornerRadius(25)
-//            }
-//            .padding(.horizontal)
-
-            
-            Spacer()
-            // Sign UP
-            NavigationLink  {
-                RegistrationView()
-                    .environmentObject(viewModel) 
-                    .navigationBarHidden(true)
-            } label: {
-                    HStack {
-                            Text("Don't have an account?")
-                                    .font(.footnote)
-                                Text("Sign Up")
-                                    .font(.footnote)
-                                    .fontWeight(.semibold)
-                            }
-                        }
-                        .padding(.bottom, 32)
-
-                    
-                    
-            
-            // Or Divider
-//            HStack {
-//                Rectangle().frame(height: 1).foregroundColor(.gray).padding(.horizontal)
-//                Text("OR").foregroundColor(.brandOrange)
-//                Rectangle().frame(height: 1).foregroundColor(.gray).padding(.horizontal)
-//            }
-//            .padding()
-//
-//            // Social Media Icons
-//            HStack(spacing: 30) {
-//                Image(systemName: "f.square") // Replace with actual FB logo
-//                Image(systemName: "applelogo")
-//                Image(systemName: "globe") // Replace with actual Google logo
-//            }
-//            .font(.title)
-//            .foregroundColor(.brandOrange)
-     
+        
+        Spacer()
+        
+        // Sign UP
+        NavigationLink  {
+            RegistrationView()
+                .environmentObject(viewModel) 
+                .navigationBarHidden(true)
+        } label: {
+            HStack {
+                Text("Don't have an account?")
+                    .font(.footnote)
+                Text("Sign Up")
+                    .font(.footnote)
+                    .fontWeight(.semibold)
+            }
+        }
+        .padding(.bottom, 32)
+        
+        // TODO: Implement social login features
+        // - Social media login buttons
+        // - "OR" divider
     }
 }
 
-//struct LoginView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        LoginView()
-//    }
-//}
+struct LoginView_Previews: PreviewProvider {
+    static var previews: some View {
+        LoginView()
+            .environmentObject(AuthViewModel())
+    }
+}

@@ -9,6 +9,7 @@
 // Sources/Coordinators/Camera/CameraCoordinator.swift
 import UIKit
 
+@MainActor
 final class CameraCoordinator: Coordinator {
 
     var childCoordinators: [Coordinator] = []
@@ -48,14 +49,18 @@ final class CameraCoordinator: Coordinator {
         nav.pushViewController(cameraVC, animated: true)
     }
     func startScanning() {
-       let vc = ScanViewController()
-       nav.pushViewController(vc, animated: true)
-   }
+        Task { @MainActor in
+            let vc = ScanViewController()
+            nav.pushViewController(vc, animated: true)
+        }
+    }
 
    // 烹飪流程（帶步驟）
     func startCooking(with steps: [RecipeStep]) {
-       let vc = CookViewController(steps: steps)
-       nav.pushViewController(vc, animated: true)
+        Task { @MainActor in
+            let vc = CookViewController(steps: steps)
+            nav.pushViewController(vc, animated: true)
+        }
     }
     private func close() {
         nav.popViewController(animated: true)

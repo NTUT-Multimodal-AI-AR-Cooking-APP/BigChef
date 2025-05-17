@@ -5,7 +5,7 @@ struct IngredientListView: View {
     var onAdd: () -> Void
     var onEdit: (Ingredient) -> Void
     var onDelete: (Ingredient) -> Void
-    
+
     var body: some View {
         CommonListView(
             title: "Ingredients",
@@ -21,7 +21,7 @@ struct IngredientListView: View {
 struct IngredientEditView: View {
     @Binding var ingredient: Ingredient
     var onSave: () -> Void
-    
+
     var body: some View {
         CommonEditView(
             title: ingredient.name.isEmpty ? "Add Ingredient" : "Edit Ingredient",

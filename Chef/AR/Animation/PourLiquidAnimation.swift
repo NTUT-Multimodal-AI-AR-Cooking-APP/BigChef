@@ -35,7 +35,7 @@ class PourLiquidAnimation: Animation {
 
     override func play(on arView: ARView) {
         let entity = pourLiquid
-        if var model = entity as? ModelEntity {
+        if let model = entity as? ModelEntity {
             model.model?.materials = [SimpleMaterial(color: color, isMetallic: false)]
         }
         let anchor = AnchorEntity(world: position)

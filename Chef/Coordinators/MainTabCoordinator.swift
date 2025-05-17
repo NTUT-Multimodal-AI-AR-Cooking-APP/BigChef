@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUICore
 
+@MainActor
 final class MainTabCoordinator: Coordinator {
 
     // MARK: - Properties
@@ -19,15 +20,17 @@ final class MainTabCoordinator: Coordinator {
     
     // MARK: - Public
     func start() {
-        startFlow()
+        Task { @MainActor in
+            await startFlow()
+        }
     }
     
-    private func startFlow() {
+    private func startFlow() async {
         let tabBar = UITabBarController()
         tabBar.viewControllers = [
-            makeHomeTab(),
-            makeScanningTab(),
-            makeHistoryTab()
+            await makeHomeTab(),
+            await makeScanningTab(),
+            await makeHistoryTab()
         ]
         tabBar.selectedIndex = 1
         tabBar.tabBar.backgroundColor = UIColor.brandOrange
@@ -45,7 +48,7 @@ final class MainTabCoordinator: Coordinator {
     }
 
     // MARK: - Private - 工具
-    private func makeHomeTab() -> UIViewController {
+    private func makeHomeTab() async -> UIViewController {
         let nav = UINavigationController()
         nav.tabBarItem = UITabBarItem(
             title: "Home",
@@ -56,12 +59,12 @@ final class MainTabCoordinator: Coordinator {
         // 建立並啟動 Home Flow
         let home = HomeCoordinator(nav: nav)     // ← 如果你還沒寫 HomeCoordinator，先用假協調器
         store(home)
-        home.start()
+        await home.start()
 
         return nav
     }
 
-    private func makeScanningTab() -> UIViewController {
+    private func makeScanningTab() async -> UIViewController {
         let nav = UINavigationController()
         nav.tabBarItem = UITabBarItem(
             title: "Scan",
@@ -71,12 +74,12 @@ final class MainTabCoordinator: Coordinator {
 
         let scan = ScanningCoordinator(nav: nav)
         store(scan)
-        scan.start()
+        await scan.start()
 
         return nav
     }
 
-    private func makeHistoryTab() -> UIViewController {
+    private func makeHistoryTab() async -> UIViewController {
         let nav = UINavigationController()
         nav.tabBarItem = UITabBarItem(
             title: "History",
@@ -86,7 +89,7 @@ final class MainTabCoordinator: Coordinator {
 
         let history = HistoryCoordinator(nav: nav)
         store(history)
-        history.start()
+        await history.start()
 
         return nav
     }

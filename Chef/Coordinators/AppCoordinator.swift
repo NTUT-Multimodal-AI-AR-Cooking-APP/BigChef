@@ -22,15 +22,20 @@
 //}
 import UIKit
 
+@MainActor
 final class AppCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     private let nav: UINavigationController
 
-    init(nav: UINavigationController) { self.nav = nav }
+    init(nav: UINavigationController) {
+        self.nav = nav
+    }
     
     func start() {
-        let main = MainTabCoordinator(nav: nav)   // 直接傳 nav
-        childCoordinators.append(main)
-        main.start()                              // 調用 start() 即可
+        Task { @MainActor in
+            let main = MainTabCoordinator(nav: nav)
+            childCoordinators.append(main)
+            await main.start()
+        }
     }
 }

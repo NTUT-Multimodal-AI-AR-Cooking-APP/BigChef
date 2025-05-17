@@ -7,15 +7,19 @@
 
 import UIKit
 
+@MainActor
 final class HomeCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
-    private unowned let nav: UINavigationController
-    init(nav: UINavigationController) { self.nav = nav }
-
+    var navigationController: UINavigationController
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+    }
+    
     func start() {
         let vc = UIViewController()
         vc.view.backgroundColor = .systemBackground
         vc.title = "Home (stub)"
-        nav.pushViewController(vc, animated: false)
+        navigationController.pushViewController(vc, animated: false)
     }
 }

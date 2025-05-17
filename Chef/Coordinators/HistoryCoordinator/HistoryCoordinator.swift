@@ -9,19 +9,20 @@
 import UIKit
 import SwiftUI
 
+@MainActor
 final class HistoryCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
-    private let nav: UINavigationController
-
-    init(nav: UINavigationController) {
-        self.nav = nav
+    var navigationController: UINavigationController
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
-
+    
     func start() {
         let vm = HistoryViewModel()
         let view = HistoryView(viewModel: vm)
         let page = UIHostingController(rootView: view)
-        nav.setNavigationBarHidden(true, animated: false)
-        nav.pushViewController(page, animated: false)
+        navigationController.setNavigationBarHidden(true, animated: false)
+        navigationController.pushViewController(page, animated: false)
     }
 }

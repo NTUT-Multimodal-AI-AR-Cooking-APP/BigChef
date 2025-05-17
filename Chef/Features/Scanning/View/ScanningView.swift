@@ -29,6 +29,7 @@ enum ScanningSheet: Identifiable {
 struct ScanningView: View {
     @StateObject private var viewModel: ScanningViewModel
     @State private var state: ScanningState
+    @EnvironmentObject private var coordinator: ScanningCoordinator
     
     init(
         viewModel: ScanningViewModel,
@@ -98,6 +99,9 @@ struct ScanningView: View {
                     viewModel.isShowingImagePreview = true
                 }
             )
+            .onAppear {
+                setupRecipeNavigationHandler()
+            }
         }
     }
     
@@ -114,12 +118,12 @@ struct ScanningView: View {
     }
     
     private var equipmentSection: some View {
-                    EquipmentListView(
-                        equipment: $viewModel.equipment,
+        EquipmentListView(
+            equipment: $viewModel.equipment,
             onAdd: { state.activeSheet = .equipment(Equipment.empty) },
             onEdit: { equipment in state.activeSheet = .equipment(equipment) },
             onDelete: { equipment in
-                withAnimation {
+                withAnimation(.easeInOut) {
                     viewModel.removeEquipment(equipment)
                 }
             }
@@ -127,12 +131,12 @@ struct ScanningView: View {
     }
     
     private var ingredientSection: some View {
-                    IngredientListView(
-                        ingredients: $viewModel.ingredients,
+        IngredientListView(
+            ingredients: $viewModel.ingredients,
             onAdd: { state.activeSheet = .ingredient(Ingredient.empty) },
             onEdit: { ingredient in state.activeSheet = .ingredient(ingredient) },
             onDelete: { ingredient in
-                withAnimation {
+                withAnimation(.easeInOut) {
                     viewModel.removeIngredient(ingredient)
                 }
             }
@@ -140,7 +144,7 @@ struct ScanningView: View {
     }
     
     private var preferenceSection: some View {
-                    PreferenceView(
+        PreferenceView(
             cookingMethod: Binding(
                 get: { state.preference.cooking_method },
                 set: { state.preference.cooking_method = $0 }
@@ -157,11 +161,11 @@ struct ScanningView: View {
     }
     
     private var actionButtons: some View {
-                    ActionButtonsView(
+        ActionButtonsView(
             onScan: {
                 viewModel.isShowingImagePicker = true
             },
-                        onGenerate: {
+            onGenerate: {
                 Task {
                     await viewModel.generateRecipe(with: state.preference)
                 }
@@ -176,23 +180,31 @@ struct ScanningView: View {
             Task { @MainActor in
                 // 更新食材列表
                 for ingredient in response.ingredients {
-                    withAnimation {
+                    withAnimation(.easeInOut) {
                         viewModel.upsertIngredient(ingredient)
                     }
                 }
                 
                 // 更新設備列表
                 for equipment in response.equipment {
-                    withAnimation {
+                    withAnimation(.easeInOut) {
                         viewModel.upsertEquipment(equipment)
                     }
                 }
                 
                 // 更新 UI 狀態
-                viewModel.isShowingImagePreview = false
-                state.scanSummary = summary
-                state.showCompletionAlert = true
+                withAnimation {
+                    viewModel.isShowingImagePreview = false
+                    state.scanSummary = summary
+                    state.showCompletionAlert = true
+                }
             }
+        }
+    }
+    
+    private func setupRecipeNavigationHandler() {
+        viewModel.onNavigateToRecipe = { [weak coordinator] recipe in
+            coordinator?.showRecipeDetail(recipe)
         }
     }
     
@@ -204,10 +216,10 @@ struct ScanningView: View {
             IngredientEditView(
                 ingredient: binding,
                 onSave: {
-                    withAnimation {
+                    withAnimation(.easeInOut) {
                         viewModel.upsertIngredient(binding.wrappedValue)
-                }
-                    state.activeSheet = nil
+                        state.activeSheet = nil
+                    }
                 }
             )
         case .equipment(let equipment):
@@ -215,10 +227,10 @@ struct ScanningView: View {
             EquipmentEditView(
                 equipment: binding,
                 onSave: {
-                    withAnimation {
+                    withAnimation(.easeInOut) {
                         viewModel.upsertEquipment(binding.wrappedValue)
-                }
-                    state.activeSheet = nil
+                        state.activeSheet = nil
+                    }
                 }
             )
         }
@@ -237,7 +249,7 @@ struct ScanningView: View {
                     array.wrappedValue[index] = newValue
                 } else {
                     array.wrappedValue.append(newValue)
-        }
+                }
             }
         )
     }
@@ -262,7 +274,7 @@ private extension Ingredient {
 private extension Equipment {
     static var empty: Self {
         Equipment(name: "", type: "", size: "", material: "", power_source: "")
-        }
+    }
 }
 
 // MARK: - Preview

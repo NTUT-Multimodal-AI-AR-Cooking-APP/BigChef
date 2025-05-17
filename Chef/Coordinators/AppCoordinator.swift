@@ -24,18 +24,16 @@ import UIKit
 
 @MainActor
 final class AppCoordinator: Coordinator {
-    var childCoordinators = [Coordinator]()
-    private let nav: UINavigationController
-
-    init(nav: UINavigationController) {
-        self.nav = nav
+    var childCoordinators: [Coordinator] = []
+    var navigationController: UINavigationController
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     func start() {
-        Task { @MainActor in
-            let main = MainTabCoordinator(nav: nav)
-            childCoordinators.append(main)
-            await main.start()
-        }
+        let main = MainTabCoordinator(navigationController: navigationController)
+        addChildCoordinator(main)
+        main.start()
     }
 }

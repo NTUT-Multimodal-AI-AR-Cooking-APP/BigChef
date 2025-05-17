@@ -23,42 +23,35 @@ final class ScanningViewModel: ObservableObject {
     var onEquipmentScanRequested: (() -> Void)?
     var onRecipeGenerated: ((SuggestRecipeResponse) -> Void)?
     var onScanCompleted: ((ScanImageResponse, String) -> Void)?
+    var onNavigateToRecipe: ((SuggestRecipeResponse) -> Void)?
     
     // MARK: - Public Methods
     
     /// 移除設備
     func removeEquipment(_ equipment: Equipment) {
-        withAnimation {
-            self.equipment.removeAll { $0.id == equipment.id }
-        }
+        self.equipment.removeAll { $0.id == equipment.id }
     }
     
     /// 移除食材
     func removeIngredient(_ ingredient: Ingredient) {
-        withAnimation {
-            ingredients.removeAll { $0.id == ingredient.id }
+        ingredients.removeAll { $0.id == ingredient.id }
+    }
+    
+    /// 更新或新增食材
+    func upsertIngredient(_ new: Ingredient) {
+        if let idx = ingredients.firstIndex(where: { $0.id == new.id }) {
+            ingredients[idx] = new
+        } else {
+            ingredients.append(new)
         }
     }
     
-    /// 更新或插入食材
-    func upsertIngredient(_ ingredient: Ingredient) {
-        withAnimation {
-            if let index = ingredients.firstIndex(where: { $0.id == ingredient.id }) {
-                ingredients[index] = ingredient
-            } else {
-                ingredients.append(ingredient)
-    }
-        }
-    }
-    
-    /// 更新或插入設備
-    func upsertEquipment(_ equipment: Equipment) {
-        withAnimation {
-            if let index = self.equipment.firstIndex(where: { $0.id == equipment.id }) {
-                self.equipment[index] = equipment
-            } else {
-                self.equipment.append(equipment)
-            }
+    /// 更新或新增設備
+    func upsertEquipment(_ new: Equipment) {
+        if let idx = equipment.firstIndex(where: { $0.id == new.id }) {
+            equipment[idx] = new
+        } else {
+            equipment.append(new)
         }
     }
 
@@ -86,10 +79,11 @@ final class ScanningViewModel: ObservableObject {
             let response = try await RecipeService.generateRecipe(using: request)
             print("✅ 成功解析 JSON，菜名：\(response.dish_name)")
             onRecipeGenerated?(response)
+            onNavigateToRecipe?(response)
         } catch {
             print("❌ 錯誤：\(error.localizedDescription)")
-                }
-            }
+        }
+    }
     
     /// 掃描圖片
     func scanImage(request: ScanImageRequest) async {

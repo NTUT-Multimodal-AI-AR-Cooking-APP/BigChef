@@ -74,7 +74,7 @@ struct CommonEditView<T: Identifiable & Equatable>: View {
                         VStack(alignment: .leading, spacing: 4) {
                             TextField(field.0 + (field.2 ? " *" : ""), text: field.1)
                                 .textFieldStyle(.roundedBorder)
-                                .onChange(of: field.1.wrappedValue) {
+                                .onChange(of: field.1.wrappedValue) { oldValue, newValue in
                                     validateField(field.0, binding: field.1, isRequired: field.2)
                                 }
                             if let error = errors[field.0] {

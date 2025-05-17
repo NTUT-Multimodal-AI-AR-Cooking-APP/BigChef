@@ -50,7 +50,7 @@ class AppDelegate: NSObject,
         window.makeKeyAndVisible()
 
         // 啟動 AppCoordinator
-        let coordinator = AppCoordinator(nav: nav)
+        let coordinator = AppCoordinator(navigationController: nav)
         self.appCoordinator = coordinator
         coordinator.start()
 

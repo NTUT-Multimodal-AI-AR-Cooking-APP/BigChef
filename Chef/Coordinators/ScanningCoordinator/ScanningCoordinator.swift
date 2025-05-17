@@ -7,49 +7,39 @@ import UIKit
 import SwiftUI      // 為了 UIHostingController
 
 @MainActor
-final class ScanningCoordinator: Coordinator {
+final class ScanningCoordinator: Coordinator, ObservableObject {
 
     // MARK: - Protocol Requirements
     var childCoordinators: [Coordinator] = []
+    var navigationController: UINavigationController
 
     // MARK: - Private
     private unowned let nav: UINavigationController
 
     // MARK: - Init
-    init(nav: UINavigationController) {
-        self.nav = nav
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+        self.nav = navigationController
     }
 
     // MARK: - Start
     func start() {
-        Task { @MainActor in
-            let vm = ScanningViewModel()
-            print("👀 Coordinator vm = \(Unmanaged.passUnretained(vm).toOpaque())")
-            
-            vm.onEquipmentScanRequested = { [weak self] in
-                guard let self else { return }
-                let camera = CameraCoordinator(nav: self.nav)
-                self.childCoordinators.append(camera)
-                camera.onFinish = { [weak self, weak camera] in
-                    guard let self, let camera else { return }
-                    self.childCoordinators.removeAll { $0 === camera }
-                }
-                camera.start()
-            }
-            
-            vm.onRecipeGenerated = { [weak self] resp in
-                guard let self else { return }
-                // 這裡一定要印得到
-                print("🛫 ScanningCoordinator 收到 resp，準備 push")
-                let recipe = RecipeCoordinator(nav: self.nav)
-                self.childCoordinators.append(recipe)
-                recipe.start(with: resp)
-            }
-
-            let page = ScanningView(viewModel: vm)
-            nav.setNavigationBarHidden(true, animated: false)
-            nav.pushViewController(UIHostingController(rootView: page), animated: false)
-        }
+        let viewModel = ScanningViewModel()
+        let view = ScanningView(viewModel: viewModel)
+            .environmentObject(self)
+        let hostingController = UIHostingController(rootView: view)
+        navigationController.pushViewController(hostingController, animated: true)
     }
 
+    func showCamera() {
+        let coordinator = CameraCoordinator(navigationController: navigationController)
+        addChildCoordinator(coordinator)
+        coordinator.start()
+    }
+    
+    func showRecipeDetail(_ recipe: SuggestRecipeResponse) {
+        let coordinator = RecipeCoordinator(navigationController: navigationController)
+        addChildCoordinator(coordinator)
+        coordinator.showRecipeDetail(recipe)
+    }
 }

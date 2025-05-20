@@ -5,32 +5,68 @@
 //  Created by 陳泓齊 on 2025/5/3.
 //
 
-//import UIKit
-//
-//final class AppCoordinator: Coordinator {
-//    var childCoordinators = [Coordinator]()
-//    private let window: UIWindow
-//    init(window: UIWindow) { self.window = window }
-//
-//    func start() {
-//        let main = MainTabCoordinator()
-//        store(main)
-//        window.rootViewController = main.root
-//        window.makeKeyAndVisible()
-//        main.start()
-//    }
-//}
 import UIKit
+import FirebaseAuth
 
+@MainActor
 final class AppCoordinator: Coordinator {
-    var childCoordinators = [Coordinator]()
-    private let nav: UINavigationController
-
-    init(nav: UINavigationController) { self.nav = nav }
+    // MARK: - Properties
+    var childCoordinators: [Coordinator] = []
+    var navigationController: UINavigationController
+    private let window: UIWindow
+    private let authViewModel: AuthViewModel
     
+    // MARK: - Initialization
+    init(window: UIWindow) {
+        self.window = window
+        self.navigationController = UINavigationController()
+        self.authViewModel = AuthViewModel()
+    }
+    
+    // MARK: - Coordinator
     func start() {
-        let main = MainTabCoordinator(nav: nav)   // 直接傳 nav
-        childCoordinators.append(main)
-        main.start()                              // 調用 start() 即可
+        window.rootViewController = navigationController
+        window.makeKeyAndVisible()
+        
+        if Auth.auth().currentUser != nil {
+            // 用戶已登入，啟動主頁面
+            let mainCoordinator = MainTabCoordinator(navigationController: navigationController, parentCoordinator: self)
+            addChildCoordinator(mainCoordinator)
+            mainCoordinator.start()
+        } else {
+            // 用戶未登入，啟動登入流程
+            let authCoordinator = AuthCoordinator(navigationController: navigationController, appCoordinator: self)
+            addChildCoordinator(authCoordinator)
+            authCoordinator.start()
+        }
+    }
+    
+    // MARK: - Public Methods
+    func showAuthFlow() {
+        // 清除現有的 child coordinators
+        childCoordinators.removeAll()
+        
+        // 啟動登入流程
+        let authCoordinator = AuthCoordinator(navigationController: navigationController, appCoordinator: self)
+        addChildCoordinator(authCoordinator)
+        authCoordinator.start()
+    }
+    
+    func showMainFlow() {
+        // 清除現有的 child coordinators
+        childCoordinators.removeAll()
+        
+        // 啟動主頁面
+        let mainCoordinator = MainTabCoordinator(navigationController: navigationController, parentCoordinator: self)
+        addChildCoordinator(mainCoordinator)
+        mainCoordinator.start()
+    }
+    
+    func handleLogout() {
+        // 使用 AuthViewModel 執行登出
+        authViewModel.logout()
+        
+        // 切換到登入流程
+        showAuthFlow()
     }
 }

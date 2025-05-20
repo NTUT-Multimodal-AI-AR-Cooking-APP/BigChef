@@ -1,152 +1,223 @@
-//
-//  ContentView.swift
-//  ChefHelper
-//
-//  Created by 陳泓齊 on 2025/4/9.
-//
-
 import SwiftUI
 
+// MARK: - Main View
 struct ScanningView: View {
-    @StateObject var viewModel: ScanningViewModel
-
-    init(viewModel: ScanningViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-        print("👀 View 使用的 vm = \(Unmanaged.passUnretained(viewModel).toOpaque())")
+    @StateObject private var state: ScanningState
+    @StateObject private var viewModel: ScanningViewModel
+    @EnvironmentObject private var coordinator: ScanningCoordinator
+    
+    init(
+        state: ScanningState,
+        viewModel: ScanningViewModel,
+        coordinator: ScanningCoordinator
+    ) {
+        self._state = StateObject(wrappedValue: state)
+        self._viewModel = StateObject(wrappedValue: viewModel)
     }
-    @State private var ingredients: [Ingredient] = [
-        Ingredient(name: "蛋", type: "蛋類", amount: "2", unit: "顆", preparation: "打散"),
-        Ingredient(name: "洋蔥", type: "蔬菜", amount: "1", unit: "顆", preparation: "切絲")
-    ]
-    @State private var equipmentItems = ["", ""]
-    @State private var generatedDishName: String = ""
-    @State private var generatedDishDescription: String = ""
-    @State private var generatedSteps: [RecipeStep] = []
     
     var body: some View {
-        ZStack{
-            ScrollView{
-                VStack(spacing:28) {
-                    HStack {
-                        Spacer()
-                        Image("QuickFeatLogo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 60)
-                    }
-                    
-                    EquipmentInfoView
-                    EquipmentButton
-                    IngredientInfoView
-                    IngredientButton
-                    PeopleSettingView
-                   
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 28) {
+                    logoView
+                    equipmentSection
+                    ingredientSection
+                    preferenceSection
+                    actionButtons
                 }
-                .ViewStyle()
-                .padding(.bottom, 88)
+                .padding()
             }
-            
-            .padding(.horizontal, 24)
-            .ignoresSafeArea(edges: .top)
-            
-            if viewModel.isLoading { RecipeLoadingView() }
+            .navigationTitle("Recipe Generator")
+            .navigationBarTitleDisplayMode(.large)
+            .modifier(SheetModifier(state: state, viewModel: viewModel))
+            .modifier(AlertModifier(state: state))
+            .modifier(LoadingModifier(isLoading: viewModel.isLoading))
+            .modifier(ImagePickerModifier(viewModel: viewModel))
         }
-    }
-            
-    var EquipmentButton : some View {
-        Button("Scanning") {
-            viewModel.equipmentButtonTapped()
-        }
-        .scanningButtonStyle().scaleEffect(0.8)
-    }
-    var IngredientButton : some View {
-        Button("Scanning") {
-            viewModel.scanButtonTapped()
-        }
-        .scanningButtonStyle().scaleEffect(0.8)
-    }
-
-    var PeopleSettingView: some View {
-        VStack(){
-            Image(systemName: "person.3.fill") // or your custom image
-                .resizable()
-                .scaledToFit()
-                .frame(width: 40, height: 40)
-                .foregroundColor(.brandOrange)
-
-            Text("PEOPLE")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.black)
-            Button(action: {
-                viewModel.equipmentItems = equipmentItems
-                viewModel.ingredients = ingredients
-                viewModel.generateRecipe()
-            }) {
-                Text("Generate Recipe")
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.brandOrange)
-                    .cornerRadius(20)
-            }
-            .padding(.horizontal, 20)
-            .scaleEffect(0.9)
-            
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(red: 1.0, green: 0.8, blue: 0.7))
-        .cornerRadius(30)
-        .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 3)
-        .padding(.horizontal, 20)
     }
     
+    // MARK: - View Components
     
-}
-
-private extension ScanningView {
-    var EquipmentInfoView : some View{
-        VStack{
-            Text("EQUIPMENT")
-            VStack(spacing: 8) {
-                ForEach(equipmentItems.indices, id: \.self) { index in
-                    TextField("Item", text: $equipmentItems[index])
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .foregroundColor(.black)
-                }
-            }
-        }
+    private var logoView: some View {
+        LogoView()
     }
-    var IngredientInfoView : some View{
-        VStack{
-            HStack {
-                Text("INGREDIENT")
-                Spacer()
-                Button(action: {
-                    // 點擊事件可填入你要的動作
-                    print("➕ Add Ingredient Tapped")
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.brandOrange)
-                        .font(.title2)
+    
+    private var equipmentSection: some View {
+        EquipmentSectionView(
+            equipment: viewModel.equipment,
+            onAdd: { state.showSheet(.equipment(Equipment.empty)) },
+            onEdit: { equipment in state.showSheet(.equipment(equipment)) },
+            onDelete: { equipment in
+                withAnimation(.easeInOut) {
+                    viewModel.removeEquipment(equipment)
                 }
             }
-            List {
-                ForEach(ingredients) { ingredient in
-                    Text(ingredient.name)
+        )
+    }
+    
+    private var ingredientSection: some View {
+        IngredientSectionView(
+            ingredients: viewModel.ingredients,
+            onAdd: { state.showSheet(.ingredient(Ingredient.empty)) },
+            onEdit: { ingredient in state.showSheet(.ingredient(ingredient)) },
+            onDelete: { ingredient in
+                withAnimation(.easeInOut) {
+                    viewModel.removeIngredient(ingredient)
                 }
             }
-            .listStyle(.plain)
-            .frame(height: 120)
-            .foregroundColor(.black)
-        }
+        )
+    }
+    
+    private var preferenceSection: some View {
+        PreferenceSectionView(viewModel: viewModel)
+    }
+    
+    private var actionButtons: some View {
+        ActionButtonsView(
+            onScan: { viewModel.showImagePicker() },
+            onGenerate: {
+                Task {
+                    await viewModel.generateRecipe()
+                }
+            }
+        )
     }
 }
 
+// MARK: - View Modifiers
 
+private struct SheetModifier: ViewModifier {
+    @ObservedObject var state: ScanningState
+    @ObservedObject var viewModel: ScanningViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .sheet(item: Binding(
+                get: { state.activeSheet },
+                set: { state.activeSheet = $0 }
+            )) { sheet in
+                sheetContent(for: sheet)
+            }
+            .sheet(isPresented: Binding(
+                get: { viewModel.isShowingImagePreview },
+                set: { _ in viewModel.hideImagePreview() }
+            )) {
+                if let image = viewModel.selectedImage {
+                    ImagePreviewView(
+                        image: image,
+                        descriptionHint: Binding(
+                            get: { viewModel.descriptionHint },
+                            set: { viewModel.updateDescriptionHint($0) }
+                        ),
+                        onScan: {
+                            Task {
+                                await viewModel.scanImage()
+                            }
+                        }
+                    )
+                }
+            }
+    }
+    
+    
+    @ViewBuilder
+    private func sheetContent(for sheet: ScanningSheet) -> some View {
+        switch sheet {
+        case .ingredient(let ingredient):
+            IngredientEditView(
+                ingredient: ingredient,
+                onSave: { newIngredient in
+                    viewModel.upsertIngredient(newIngredient)
+                    state.dismissSheet()
+                },
+                onCancel: state.dismissSheet
+            )
+            
+        case .equipment(let equipment):
+            EquipmentEditView(
+                equipment: equipment,
+                onSave: { newEquipment in
+                    viewModel.upsertEquipment(newEquipment)
+                    state.dismissSheet()
+                },
+                onCancel: state.dismissSheet
+            )
+        }
+    }
+}
 
-#Preview {
-    ScanningView(viewModel: ScanningViewModel())
+private struct AlertModifier: ViewModifier {
+    @ObservedObject var state: ScanningState
+    
+    func body(content: Content) -> some View {
+        content
+            .alert("掃描完成", isPresented: Binding(
+                get: { state.showCompletionAlert },
+                set: { if !$0 { state.reset() } }
+            )) {
+                Button("完成", role: .cancel) {
+                    state.reset()
+                }
+            } message: {
+                Text(state.scanSummary)
+            }
+    }
+}
+
+private struct LoadingModifier: ViewModifier {
+    let isLoading: Bool
+    
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                if isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(.ultraThinMaterial)
+                }
+            }
+    }
+}
+
+private struct ImagePickerModifier: ViewModifier {
+    @ObservedObject var viewModel: ScanningViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .imageSourcePicker(
+                isPresented: Binding(
+                    get: { viewModel.isShowingImagePicker },
+                    set: { if !$0 { viewModel.hideImagePicker() } }
+                ),
+                selectedImage: Binding(
+                    get: { viewModel.selectedImage },
+                    set: { viewModel.handleSelectedImage($0) }
+                ),
+                onImageSelected: { image in
+                    viewModel.handleSelectedImage(image)
+                }
+            )
+    }
+}
+
+// MARK: - Preview
+struct ScanningView_Previews: PreviewProvider {
+    @MainActor
+    static var previews: some View {
+        let state = ScanningState()
+        let viewModel = ScanningViewModel(
+            state: state,
+            onNavigateToRecipe: { _ in }
+        )
+        let coordinator = ScanningCoordinator(navigationController: UINavigationController())
+        
+        return ScanningView(
+            state: state,
+            viewModel: viewModel,
+            coordinator: coordinator
+        )
+        .environmentObject(coordinator)
+    }
 }
 

@@ -16,7 +16,6 @@ struct ChefHelperApp: App {
         WindowGroup {
 //            ScanningView(viewModel: ScanningViewModel())
             EmptyView() // 不再從這裡開始
-//            ContentView()
         }
     }
 }
